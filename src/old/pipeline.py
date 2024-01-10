@@ -6,9 +6,9 @@ import string
 import random as rnd
 
 from data import generate_data, format_data
-from model import gaussian_process
+from src.gaussian_process import gaussian_process
 from plot import plot_model_performance, plot_model_samples_dual, plot_window_comparison
-from quantum import swap_test_circuit, inversion_test_circuit, data_reupload_circuit
+from src.quantum_circuits import swap_test_circuit, inversion_test_circuit, data_reupload_circuit
 from evolution import evolve
 from evaluation import fitness
 
