@@ -99,16 +99,16 @@ quantum_circuit_function = lambda parameters, angle_scaling_minimum, angle_scali
 data = generate_data(12, 50.0, "basf-qcp")
 training_data, testing_data = format_data(data, 10)
 
-colours = __plot_init([14, 6], True)
+# colours = __plot_init([14, 6], True)
 
-fig, ax = plt.subplots(1, 1)
+# fig, ax = plt.subplots(1, 1)
 
-fig.text(0.525, 0.02, 'Time', ha='center')
-fig.text(0.025, 0.5, 'Value', va='center', rotation='vertical')
-plt.subplots_adjust(left = 0.1, right = 0.95, top = 0.9, bottom = 0.15)
+# fig.text(0.525, 0.02, 'Time', ha='center')
+# fig.text(0.025, 0.5, 'Value', va='center', rotation='vertical')
+# plt.subplots_adjust(left = 0.1, right = 0.95, top = 0.9, bottom = 0.15)
 
-plt.suptitle("Classical Kernel vs Quantum Kernel    >>    Seed 'basf-qcp'")
-plt.ylim([42.5, 56.0])
+# plt.suptitle("Classical Kernel vs Quantum Kernel    >>    Seed 'basf-qcp'")
+# plt.ylim([42.5, 56.0])
 
 # dataset_seeds = ["basf-qcp", "basf", "qcp", "team-a", "lmu"]
 # dataset_starts = [50.0, 47.0, 53.0, 48.5, 51.5]
@@ -120,9 +120,9 @@ qmodel = gaussian_process(training_data, quantum_kernel, quantum_circuit_functio
 
 kmodel_normalised_covmat = (kmodel.covariance_matrix - np.min(kmodel.covariance_matrix)) / (np.max(kmodel.covariance_matrix) - np.min(kmodel.covariance_matrix))
 
-plot_covariance_matrix(kmodel.covariance_matrix, "Classical Covariance Matrix", True)
-plot_covariance_matrix(kmodel_normalised_covmat, "Classical Covariance Matrix Normalised", True)
-plot_covariance_matrix(qmodel.covariance_matrix, "Quantum Covariance Matrix", True)
+# plot_covariance_matrix(kmodel.covariance_matrix, "Classical Covariance Matrix", True)
+# plot_covariance_matrix(kmodel_normalised_covmat, "Classical Covariance Matrix Normalised", True)
+# plot_covariance_matrix(qmodel.covariance_matrix, "Quantum Covariance Matrix", True)
     
 # x_train = training_data["time"].to_numpy()
 # y_train = training_data["value"].to_numpy()

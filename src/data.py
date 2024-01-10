@@ -67,6 +67,10 @@ def format_data (data, training_window):
 
     return (training_data, testing_data)
 
+def build_prediction_timepoints (start = 0.0, end = 10.0, step = 1.0):
+
+    return np.arange(start, end + step, step)
+
 def angle_scaling (data, minimum, maximum, maximum_angle = np.pi):
 
     # TODO: method can be more adaptible if arctan or similar function used to normalise values
@@ -79,20 +83,3 @@ def angle_scaling (data, minimum, maximum, maximum_angle = np.pi):
     embedder = np.vectorize(lambda value: ((value - minimum) / data_range) * maximum_angle)
     
     return embedder(data)
-
-def train_test_split (data, test_samples):
-    
-    days = len(data["time"])
-    
-    features = data["time"].values.reshape(days, 1)
-    targets = data["value"].values.reshape(days, 1)
-    
-    if test_samples == 0:
-        test_samples = -1 * days
-    
-    x_train = features[: -1 * test_samples]
-    y_train = targets[: -1 * test_samples]
-    x_test = features[-1 * test_samples :]
-    y_test = targets[-1 * test_samples :]
-    
-    return x_train, y_train, x_test, y_test
