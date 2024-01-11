@@ -51,7 +51,7 @@ def fitness (model, granularity, training_x, prediction_x, target_aucs, plot = F
         
     if plot:
         
-        if not training_y or not target_y:
+        if type(training_y) is not np.ndarray or type(target_y) is not np.ndarray:
             print("ERROR: fitness() requires the y coordinates of the target function built with build_fitness_target() if a plot should be created.")
         
         plot_fitness(
