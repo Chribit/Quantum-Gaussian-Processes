@@ -71,6 +71,10 @@ def fitness (model, granularity, training_x, prediction_x, target_aucs, plot = F
         )
 
     fitness_sharpness = 2
+    average_variance = np.sum(sigmas) / len(training_x)
+    
+    if (average_variance > 0.5):
+        x += average_variance
 
     return 1.0 - (x / (x + fitness_sharpness))
     
