@@ -46,3 +46,13 @@ def rational_quadratic (x1, x2, parameters):
     return (variance ** 2) * (1 + ( ((x1 - x2) ** 2) / (2 * weighting * (length ** 2)) )) ** (-1 * weighting)
 
 
+
+
+def combined_kernel_1 (x1, x2, parameters):
+    
+    output = white_noise(x1, x2, parameters[:1])
+    output += rbf(x1, x2, parameters[1:3])
+    output += constant(x1, x2, parameters[3:4])
+    output += sine_squared(x1, x2, parameters[4:])
+    
+    return output
