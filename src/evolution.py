@@ -13,7 +13,6 @@ from evaluation import fitness
 np.set_printoptions(precision=5)
 
 _logging = False
-_keep_initial_parameters = False
 _model = None
 _fitness_granularity = 0.5
 _population_size = 100
@@ -22,8 +21,6 @@ _parent_survivorship = 0
 _mutation_probability = 0.5
 _mutation_rate = 1.0
 _crossover_probability = 0.5
-_minimum_change = 0.0
-_maximum_change = 10000.0
 _current_cycle = 0
 _population_split = 50
 _parent_indices = None
@@ -38,9 +35,20 @@ _choice_resampler_function = None
 
 
 
-def evolve (initial_parameters, model, fitness_granularity, cycles, population_size, parent_survivorship, mutation_probability, crossover_probability, minimum_change = 0.00001, maximum_change = 10000.0, keep_initial_parameters = False, logging = False):
+def evolve (
+    model,
+    gene_reader,
+    gene_count,
+    fitness_granularity,
+    cycles,
+    population_size,
+    parent_survivorship,
+    mutation_probability,
+    crossover_probability,
+    logging = False
+):
     
-    best_genes = np.array(initial_parameters)
+    best_genes = initialise_genes(gene_count)
     
     if (population_size % 2 != 0):
         print("\nERROR: population_size in evolve() has to be a multiple of 2")
@@ -55,16 +63,14 @@ def evolve (initial_parameters, model, fitness_granularity, cycles, population_s
         sys.exit(1)
     
     global _logging
-    global _keep_initial_parameters
     global _model
+    global _gene_reader
     global _fitness_granularity
     global _population_size
     global _genome_length
     global _parent_survivorship
     global _mutation_probability
     global _crossover_probability
-    global _minimum_change
-    global _maximum_change
     global _current_cycle
     global _population_split
     global _parent_indices
@@ -75,16 +81,14 @@ def evolve (initial_parameters, model, fitness_granularity, cycles, population_s
     global _choice_resampler_function
     
     _logging = logging
-    _keep_initial_parameters = keep_initial_parameters
     _model = model
+    _gene_reader = gene_reader
     _fitness_granularity = fitness_granularity
     _population_size = population_size
-    _genome_length = len(initial_parameters)
+    _genome_length = gene_count
     _parent_survivorship = parent_survivorship
     _mutation_probability = mutation_probability
     _crossover_probability = crossover_probability
-    _minimum_change = minimum_change
-    _maximum_change = maximum_change
     _population_split = int(population_size / 2)
     _parent_indices = np.arange(_population_split)
     
@@ -93,7 +97,7 @@ def evolve (initial_parameters, model, fitness_granularity, cycles, population_s
     _choice_resampler_function = np.vectorize(resample_choice, [np.float32])
     
     determine_parent_probabilities()
-    populate(initial_parameters)
+    populate(best_genes)
     
     for cycle in range(cycles):
         
@@ -117,9 +121,13 @@ def evolve (initial_parameters, model, fitness_granularity, cycles, population_s
         print("Final Result:")
         print(best_fitness)
         print("-------------")
-        print(best_genes)
+        print("genes:", best_genes)
+        print("parameters:", np.array(_gene_reader(best_genes)))
     
     return best_genes
+
+def initialise_genes (gene_count):
+    return np.random.uniform(0.0, 1.0, gene_count)
 
 def populate (gene_seed):
     
@@ -127,9 +135,6 @@ def populate (gene_seed):
     
     gene_seeds = np.full((_population_size, _genome_length), gene_seed)
     _population = _mutation_function(gene_seeds)
-        
-    if (_keep_initial_parameters):
-        _population[0] = gene_seed
 
 def reproduce ():
     
@@ -225,14 +230,14 @@ def mutate (genome):
     individual = np.copy(genome)
     
     individual += changes * change_flags
-    individual = np.clip(individual, _minimum_change, _maximum_change)
+    individual = np.clip(individual, 0.0, 1.0)
     
     return individual
 
 def determine_mutation_rate ():
     
     global _mutation_rate    
-    _mutation_rate = np.exp(-1 * _current_cycle * 0.1) * ((_maximum_change - _minimum_change) / 2.0)
+    _mutation_rate = np.exp(-1 * _current_cycle * 0.1) * (1.0 / 2.0)
 
 def crossover (mother_genome, father_genome):
         
@@ -286,8 +291,8 @@ def select (selection_size):
         print("\tselection done.")
 
 def evaluate_individual (individual_index, individual):
-        
-    _model.set_kernel_parameters(individual)
+    
+    _model.set_kernel_parameters( _gene_reader(individual))
     individual_fitness = fitness(_model, _fitness_granularity)
     
     if (_logging):
