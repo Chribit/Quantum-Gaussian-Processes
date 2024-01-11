@@ -5,7 +5,8 @@ import sys
 import os
 import math
 
-from evaluation import fitness
+from evaluation import fitness, build_fitness_target
+from data import build_prediction_timepoints
 
 
 
@@ -74,6 +75,9 @@ def evolve (
     global _model
     global _gene_reader
     global _fitness_granularity
+    global _training_timepoints
+    global _prediction_timepoints
+    global _target_aucs
     global _population_size
     global _genome_length
     global _parent_survivorship
@@ -88,10 +92,15 @@ def evolve (
     global _crossover_function
     global _choice_resampler_function
     
+    training_x, training_y = model.get_training_data()
+    
     _logging = logging
     _model = model
     _gene_reader = gene_reader
     _fitness_granularity = fitness_granularity
+    _training_timepoints = training_x
+    _prediction_timepoints = build_prediction_timepoints(training_x[0], training_x[-1], _fitness_granularity)
+    _target_aucs = build_fitness_target(training_x, training_y, _prediction_timepoints, _fitness_granularity)[1]
     _population_size = population_size
     _genome_length = gene_count
     _parent_survivorship = parent_survivorship
@@ -301,7 +310,7 @@ def select (selection_size):
 def evaluate_individual (individual_index, individual):
     
     _model.set_kernel_parameters( _gene_reader(individual))
-    individual_fitness = fitness(_model, _fitness_granularity)
+    individual_fitness = fitness(_model, _fitness_granularity, _training_timepoints, _prediction_timepoints, _target_aucs)
     
     if (_logging):
         print("\t\t\tindividual %d evaluated: %.4f" % (individual_index, individual_fitness))
