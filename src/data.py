@@ -69,7 +69,7 @@ def format_data (data, training_window):
 
 def build_prediction_timepoints (start = 0.0, end = 10.0, step = 1.0):
 
-    return np.arange(start, end + step, step)
+    return np.arange(start, (end - 1.0) + step, step)
 
 def angle_scaling (data, minimum, maximum, maximum_angle = np.pi):
 

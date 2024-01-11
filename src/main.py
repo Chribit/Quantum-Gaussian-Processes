@@ -5,15 +5,18 @@ from evolution import evolve
 from classical_kernel import combined_kernel_1
 from evaluation import fitness, build_fitness_target
 import numpy as np
+import sys
 
 
 
+days = 20
+seed = "lmu"
+data = generate_data(days, 69, "lmu")
+plot_dataset(data, "Generated Dataset (Seed: '" + seed + "')", True, "dataset_" + seed)
 
-data = generate_data(20, 100, "stein")
-plot_dataset(data, "Generated Dataset (Seed: 'stein')", True, "dataset_stein")
-
-training_data, testing_data = format_data(data, 15)
-prediction_x = build_prediction_timepoints(0.0, 20.0, 0.1)
+training_window = 15
+training_data, testing_data = format_data(data, training_window)
+prediction_x = build_prediction_timepoints(0.0, float(days), 0.1)
 
 
 
@@ -37,16 +40,13 @@ best_parameters = evolve(
     model,
     classical_gene_reader,
     7,
-    0.1,
-    20,
-    100,
-    10,
+    0.25,
+    5,
+    90,
     0.5,
     0.25,
     True
 )
-
-# best_parameters = [0.70334, 0.20593, 0.12266, 0.15243, 0.82494, 0.06506, 0.53513]
 
 model.set_kernel_parameters( classical_gene_reader(best_parameters))
 
@@ -57,7 +57,8 @@ y_test  = testing_data["value"].to_numpy()
 x_pred = prediction_x
 y_pred, sigmas = model.predict(prediction_x)
 
-target_y, target_aucs = build_fitness_target(x_train, y_train, x_pred, 0.1)
-fitness(model, 0.1, x_train, x_pred, target_aucs, True, y_train, target_y)
+window_prediction_x = build_prediction_timepoints(0.0, float(training_window), 0.1)
+target_y, target_aucs = build_fitness_target(x_train, y_train, window_prediction_x, 0.1)
+fitness(model, 0.1, x_train, window_prediction_x, target_aucs, True, y_train, target_y)
 
-plot_prediction("Model Prediction Performance", x_train, y_train, x_test, y_test, x_pred, y_pred, sigmas, False, [np.min(y_pred), np.max(y_pred)], True, "classical_prediction_performance")
+plot_prediction("Model Prediction Performance", x_train, y_train, x_test, y_test, x_pred, y_pred, sigmas, False, [np.min(data["value"].to_numpy()), np.max(data["value"].to_numpy())], True, "classical_prediction_performance")
