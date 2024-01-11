@@ -43,7 +43,6 @@ def evolve (
     fitness_granularity,
     cycles,
     population_size,
-    parent_survivorship,
     mutation_probability,
     crossover_probability,
     logging = False
@@ -99,11 +98,11 @@ def evolve (
     _gene_reader = gene_reader
     _fitness_granularity = fitness_granularity
     _training_timepoints = training_x
-    _prediction_timepoints = build_prediction_timepoints(training_x[0], training_x[-1], _fitness_granularity)
+    _prediction_timepoints = build_prediction_timepoints(training_x[0], training_x[-1] + 1, _fitness_granularity)
     _target_aucs = build_fitness_target(training_x, training_y, _prediction_timepoints, _fitness_granularity)[1]
     _population_size = population_size
     _genome_length = gene_count
-    _parent_survivorship = parent_survivorship
+    _parent_survivorship = int(_population_size * 0.1)
     _mutation_probability = mutation_probability
     _crossover_probability = crossover_probability
     _population_split = int(population_size / 2)
