@@ -50,6 +50,14 @@ def evolve (
     
     best_genes = initialise_genes(gene_count)
     
+    if (fitness_granularity > 1.0 or fitness_granularity < 0.0):
+        print("\nERROR: fitness_granularity in evolve() for fitness() has to be between 0.0 and 1.0")
+        sys.exit(1)
+    
+    if (math.modf(1.0 / fitness_granularity)[0] != 0):
+        print("\nERROR: fitness_granularity in evolve() for fitness() has to divide 1 without remainder")
+        sys.exit(1)
+    
     if (population_size % 2 != 0):
         print("\nERROR: population_size in evolve() has to be a multiple of 2")
         sys.exit(1)
