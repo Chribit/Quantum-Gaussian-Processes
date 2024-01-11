@@ -77,3 +77,47 @@ def plot_dataset (data, title, save = False, filename = "new_plot"):
         fig.savefig(image_folder + filename + ".png", transparent = True)
     else:
         plt.show()
+        
+def plot_prediction (title, x_train, y_train, x_test, y_test, x_pred, y_pred, sigmas, x_limits = False, y_limits = False, save = False, filename = "new_plot"):
+    
+    colours = __plot_init([12, 6], save)
+    
+    x_test_line = np.append(np.array(x_train[-1]), x_test)
+    y_test_line = np.append(np.array(y_train[-1]), y_test)
+    
+    fig, ax = plt.subplots(1, 1)
+    
+    fig.text(0.525, 0.02, "Time", ha = "center")
+    fig.text(0.025, 0.5, "Value", va = "center", rotation = "vertical")
+    plt.subplots_adjust(left = 0.1, right = 0.95, top = 0.9, bottom = 0.15)
+
+    plt.suptitle(title)
+    
+    if (x_limits != False):
+        plt.xlim(x_limits)
+        
+    if (y_limits != False):
+        plt.ylim(y_limits)
+    
+    plt.fill_between(
+        x_pred,
+        np.subtract(y_pred, sigmas),
+        np.add(y_pred, sigmas),
+        color = colours[2],
+        alpha = 0.33
+    )
+    ax.plot(x_pred, y_pred, color = colours[2], label = "predictions")
+    ax.plot(x_train, y_train, color = colours[-1], alpha = 0.33)
+    ax.plot(x_test_line, y_test_line, color = colours[1], alpha = 0.33)
+    ax.plot(x_train, y_train, 'o', color = colours[-1], label = "training data")
+    ax.plot(x_test, y_test, 'o', color = colours[1], label = "testing data")
+    
+    legend = plt.legend(loc = "lower left", frameon = False)
+    frame = legend.get_frame()
+    frame.set_facecolor("#000000")
+    
+    if save:
+        fig.savefig(image_folder + filename + ".png", transparent = True)
+    else:
+        plt.show()
+
