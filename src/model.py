@@ -6,11 +6,11 @@ import sys
 
 class gaussian_process:
     
-    def __init__ (self, dataset, kernel, quantum_circuit_callable = None, minimum_prediction_x = None, maximum_prediction_x = None, kernel_parameters = []):
+    def __init__ (self, training_data, kernel, quantum_circuit_callable = None, minimum_prediction_x = None, maximum_prediction_x = None, kernel_parameters = []):
         
         self.kernel = kernel
-        self.x_train = dataset["time"].to_numpy()
-        self.y_train = dataset["value"].to_numpy()
+        self.x_train = training_data["time"].to_numpy()
+        self.y_train = training_data["value"].to_numpy()
         self.quantum_circuit_callable = quantum_circuit_callable
         self.is_quantum = not isinstance(self.quantum_circuit_callable, type(None))
         
