@@ -295,7 +295,7 @@ def select (selection_size):
         process_pool.close()
         
     individual_fitnesses.insert(1, "fitness", fitnesses)
-    individual_fitnesses = individual_fitnesses.sort_values("fitness").head(selection_size)
+    individual_fitnesses = individual_fitnesses.sort_values("fitness", ascending =  False).head(selection_size)
     
     _population = _population[individual_fitnesses["individual"].to_numpy()]
     _population_fitnesses = individual_fitnesses["fitness"].to_numpy()

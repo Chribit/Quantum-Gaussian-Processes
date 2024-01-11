@@ -4,6 +4,7 @@ import math
 import sys
 from data import build_prediction_timepoints
 from plot import plot_fitness
+import math
 
 
 
@@ -34,7 +35,7 @@ def fitness (model, granularity, training_x, prediction_x, target_aucs, plot = F
     prediction_y, sigmas = model.predict(prediction_x)
 
     per_step_iterations = int(1 / granularity)
-    fitness = 0
+    x = 0
     
     for index in range( len(training_x[:-1])):
         
@@ -47,7 +48,7 @@ def fitness (model, granularity, training_x, prediction_x, target_aucs, plot = F
                     prediction_x[prediction_index : prediction_index + 2]
                 )
         
-        fitness += abs(prediction_auc - target_aucs[index])
+        x += abs(prediction_auc - target_aucs[index])
         
     if plot:
         
@@ -69,5 +70,7 @@ def fitness (model, granularity, training_x, prediction_x, target_aucs, plot = F
             "fitness_evaluation"
         )
 
-    return fitness
+    fitness_sharpness = 2
+
+    return 1.0 - (x / (x + fitness_sharpness))
     
