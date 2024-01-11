@@ -26,7 +26,10 @@ class gaussian_process:
             self.minimum_prediction_x = float(minimum_prediction_x) 
             self.maximum_prediction_x = float(maximum_prediction_x)
         
-        self.set_kernel_parameters(kernel_parameters)
+        if kernel_parameters != []:
+            self.set_kernel_parameters(kernel_parameters)
+        else:
+            self.kernel_parameters = kernel_parameters
     
     def get_training_data (self):
         
