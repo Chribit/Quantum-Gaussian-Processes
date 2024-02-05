@@ -71,9 +71,10 @@ def build_prediction_timepoints (start = 0.0, end = 10.0, step = 1.0):
 
     return np.arange(start, (end - 1.0) + step, step)
 
+
 def angle_scaling (data, minimum, maximum, maximum_angle = np.pi):
 
-    # TODO: method can be more adaptible if arctan or similar function used to normalise values
+    # TODO: method can be more adaptible if arctan or similar function used to normalise values --> no more minimum and maximum
 
     data_range = maximum - minimum
     

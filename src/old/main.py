@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from pipeline import predicton_pipeline, sampling_pipeline, window_size_exploration_pipeline
-from classical_kernel import rbf, white_noise, constant, sine_squared
+from src.kernel import rbf, white_noise, constant, sine_squared
 from plot import plot_model_performance, __plot_init, plot_covariance_matrix
 from data import generate_data, format_data
 from src.gaussian_process import gaussian_process

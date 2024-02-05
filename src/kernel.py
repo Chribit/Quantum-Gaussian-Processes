@@ -61,5 +61,15 @@ def classical_kernel_1 (x1, x2, parameters):
 
 
 def quantum_kernel_1 (x1, x2, circuit):
-     
-    return circuit(x1, x2)
+    
+    output = circuit(x1, x2)
+    
+    if output.shape == (2,):
+        output = [output[1]]
+    else:
+        output = output[:, 1]
+    
+    output = np.clip(output, 0.0, 0.5)
+    output = 1.0 - 2.0 * output
+    
+    return output
