@@ -1,5 +1,6 @@
 import pennylane as qml
-from pennylane import numpy as np
+# from pennylane import numpy as np
+import numpy as np
 from data import angle_scaling
 
 
@@ -8,7 +9,7 @@ from data import angle_scaling
 class gaussian_process:
     
     # 1. constructor; recieves formatted training data, a callable kernel function, parameters for that kernel function
-    def __init__ (self, training_data, kernel, kernel_parameters = [], is_quantum = False):
+    def __init__ (self, training_data, kernel, kernel_parameters = np.array([]), is_quantum = False):
         
         # 1. set internal training x and y
         self.training_x = training_data["time"].to_numpy()
@@ -27,19 +28,19 @@ class gaussian_process:
             self.circuit_wire_count = 9
             
             # 2. set parameter count per layer
-            self.layer_parameter_count = 12
+            self.layer_parameter_count = 2 * ((4 ** 4) - 1)
         
         # 5. set provided kernel parameters and build covariance matrix
         self.set_kernel_parameters(kernel_parameters)
             
     # 2. updates kernel_parameters field in model and builds the covariance matrix on update
-    def set_kernel_parameters (self, kernel_parameters = []):
+    def set_kernel_parameters (self, kernel_parameters = np.array([])):
         
         # 1. store provided kernel parameters
         self.kernel_parameters = kernel_parameters
         
         # 2. if kernel_parameters is an empty array
-        if self.kernel_parameters == []:
+        if self.kernel_parameters.size == 0:
             
             # 1. prevent further execution
             return
@@ -136,21 +137,28 @@ class gaussian_process:
             # 5. iterate over circuit parameter subarrays
             for parameters in circuit_parameters:
                 
-                # 1. add rx gates for x1 value reupload layer
+                # 1. split parameters into x1 and x2 subarrays
+                split_parameters = np.split(parameters, 2)
+                
+                # 2. add rx gates for x1 value reupload layer
                 qml.RX(x1, 1)
                 qml.RX(x1, 2)
                 qml.RX(x1, 3)
                 qml.RX(x1, 4)
                 
-                # 2. add rx gates for x2 value reupload layer
+                # 3. add a special unitary for x1
+                qml.SpecialUnitary(split_parameters[0], [1, 2, 3, 4])
+                
+                # 4. add rx gates for x2 value reupload layer
                 qml.RX(x2, 5)
                 qml.RX(x2, 6)
                 qml.RX(x2, 7)
                 qml.RX(x2, 8)
                 
-                # TODO: add SU gates here --> provide parameters to it
+                # 5. add a special unitary for x2
+                qml.SpecialUnitary(split_parameters[1], [5, 6, 7, 8])
                 
-                # 3. add barrier visual along all reupload wires for cleaner circuit appearance
+                # 6. add barrier visual along all reupload wires for cleaner circuit appearance
                 qml.Barrier([1, 2, 3, 4, 5, 6, 7, 8], only_visual = True)
 
             # 6. add cswap gates from the measurement wire to each pair of reupload wires
@@ -178,19 +186,13 @@ class gaussian_process:
             return
         
         # 2. fetch diagram caller function via pennylane draw_mpl function
-        drawer = qml.draw_mpl(self.quantum_circuit, show_all_wires = True, decimals = 2, fontsize = 11)
+        drawer = qml.draw_mpl(self.quantum_circuit, show_all_wires = True, decimals = 2, fontsize = 18, style = "solarized_light")
         
         # 3. call drawer function with throwaway parameters --> same parameter signature as circuit function in self.quantum_circuit
         fig, ax = drawer([0], [1])
         
         # 4. return figure
         return fig
-    
-    # 6. check if a model is quantum
-    def is_quantum (self):
-        
-        # 1. return is_quantum flag
-        return self.is_quantum
     
     # def sample_prior (self, samples, mean):
             

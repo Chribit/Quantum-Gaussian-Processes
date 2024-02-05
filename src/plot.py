@@ -164,7 +164,7 @@ def plot_fitness (title, x_train, y_train, fitness_x, fitness_y, x_pred, y_pred,
         
 def plot_circuit (title, quantum_model, save = False, filename = "new_circuit_plot"):
     
-    if not quantum_model.is_quantum():
+    if not quantum_model.is_quantum:
         return
     
     __plot_init([12, 6], save)
