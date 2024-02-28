@@ -32,7 +32,7 @@ def classical_gene_reader (genes):
 
 
 
-quantum_parameters = np.ones(4 * 2 * ((4 ** 4) - 1))
+quantum_parameters = np.ones(2 * ((4 ** 4) - 1))
 
 model = gaussian_process(
     training_data,
@@ -41,7 +41,7 @@ model = gaussian_process(
     True
 )
 
-plot_circuit("Reupload Circuit", model, True, "reupload_circuit")
+plot_circuit("Reupload Circuit (Inversion Test)", model, True, "reupload_circuit_inversion_test")
 
 
 

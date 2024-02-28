@@ -24,11 +24,8 @@ class gaussian_process:
         # 4. if model is quantum
         if self.is_quantum:
             
-            # 1. set wire count to be used in the quantum circuit
-            self.circuit_wire_count = 9
-            
             # 2. set parameter count per layer
-            self.layer_parameter_count = 2 * ((4 ** 4) - 1)
+            self.layer_parameter_count = (4 ** 4) - 1
         
         # 5. set provided kernel parameters and build covariance matrix
         self.set_kernel_parameters(kernel_parameters)
@@ -116,67 +113,58 @@ class gaussian_process:
         
         # 2. reshape kernel parameters to be split into subarrays for each layer
         circuit_parameters = np.reshape(self.kernel_parameters, (-1, self.layer_parameter_count))
-        
+
         # 3. define a qml function to build the quantum circuit
-        @qml.qnode(qml.device('lightning.qubit', self.circuit_wire_count))
+        @qml.qnode(qml.device('lightning.qubit', 4))
         def circuit (x1, x2):
             
-            # 1. add a hadamard gate on the measurement wire
-            qml.Hadamard(0)
-            
-            # 2. concatenate provided x values to be compared in the kernel circuit
+            # 1. concatenate provided x values to be compared in the kernel circuit
             fused = np.concatenate((x1, x2))
             
-            # 3. apply angle scaling to concatenated values --> provide range of x values to train on
+            # 2. apply angle scaling to concatenated values --> provide range of x values to train on
             scaled = angle_scaling(fused, 0.0, 11.0)
             
-            # 4. overwrite inputs with scaled versions
+            # 3. overwrite inputs with scaled versions
             x1 = scaled[:len(x1)]
             x2 = scaled[len(x1):]
             
-            # 5. iterate over circuit parameter subarrays
+            # 4. iterate over circuit parameters and build layers for x1
             for parameters in circuit_parameters:
                 
-                # 1. split parameters into x1 and x2 subarrays
-                split_parameters = np.split(parameters, 2)
+                # 1. build reupload layer
+                self.build_reupload_layer(x1, parameters)
                 
-                # 2. add rx gates for x1 value reupload layer
-                qml.RX(x1, 1)
-                qml.RX(x1, 2)
-                qml.RX(x1, 3)
-                qml.RX(x1, 4)
+                # 2. add barrier visual along all reupload wires for cleaner circuit appearance
+                qml.Barrier([3, 2, 1, 0], only_visual = True)
                 
-                # 3. add a special unitary for x1
-                qml.SpecialUnitary(split_parameters[0], [1, 2, 3, 4])
+            # 5. iterate over circuit parameters and build layers for x2
+            for parameters in circuit_parameters:
                 
-                # 4. add rx gates for x2 value reupload layer
-                qml.RX(x2, 5)
-                qml.RX(x2, 6)
-                qml.RX(x2, 7)
-                qml.RX(x2, 8)
+                # 1. build adjoint reupload layer
+                qml.adjoint(self.build_reupload_layer)(x2, parameters)
                 
-                # 5. add a special unitary for x2
-                qml.SpecialUnitary(split_parameters[1], [5, 6, 7, 8])
-                
-                # 6. add barrier visual along all reupload wires for cleaner circuit appearance
-                qml.Barrier([1, 2, 3, 4, 5, 6, 7, 8], only_visual = True)
+                # 2. add barrier visual along all reupload wires for cleaner circuit appearance
+                qml.Barrier([3, 2, 1, 0], only_visual = True)
 
-            # 6. add cswap gates from the measurement wire to each pair of reupload wires
-            qml.CSWAP([0, 1, 5])
-            qml.CSWAP([0, 2, 6])
-            qml.CSWAP([0, 3, 7])
-            qml.CSWAP([0, 4, 8])
-
-            # 7. add a hadamard gate on the measurement wire
-            qml.Hadamard(0)
-
-            # 8. measure qubit on measurement wire and return the probabilities
-            return qml.probs(0)
+            # 6. measure qubit on measurement wire and return the probabilities
+            return qml.probs(wires = [0, 1, 2, 3])
         
         # 4. store circuit builder function in model
         self.quantum_circuit = circuit
     
-    # 5. plots a quantum circuit 
+    # 5. build reupload layer quantum gates
+    def build_reupload_layer (self, x, parameters):
+                    
+        # 1. add rx gates for x1 value reupload layer
+        qml.RX(x, 3)
+        qml.RX(x, 2)
+        qml.RX(x, 1)
+        qml.RX(x, 0)
+        
+        # 2. add a special unitary for x1
+        qml.SpecialUnitary(parameters, [3, 2, 1, 0])
+    
+    # 6. plots a quantum circuit 
     def plot_quantum_circuit (self):
         
         # 1. if model isn't quantum
