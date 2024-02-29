@@ -1,7 +1,7 @@
 import pennylane as qml
 # from pennylane import numpy as np
 import numpy as np
-from data import angle_scaling
+from data import angle_scaling, invert_matrix
 
 
 
@@ -30,7 +30,13 @@ class gaussian_process:
         # 5. set provided kernel parameters and build covariance matrix
         self.set_kernel_parameters(kernel_parameters)
             
-    # 2. updates kernel_parameters field in model and builds the covariance matrix on update
+    # 2. getter for training data provided to model
+    def get_training_data (self):
+        
+        # 1. return training data as set of x and y
+        return (self.training_x, self.training_y)        
+    
+    # 3. updates kernel_parameters field in model and builds the covariance matrix on update
     def set_kernel_parameters (self, kernel_parameters = np.array([])):
         
         # 1. store provided kernel parameters
@@ -51,7 +57,7 @@ class gaussian_process:
         # 4. build covariance matrix
         self.build_covariance_matrix()
     
-    # 3. builds the gaussian process covariance matrix using models internal state
+    # 4. builds the gaussian process covariance matrix using models internal state
     def build_covariance_matrix (self):
         
         # 1. initialise empty covariance matrix
@@ -102,7 +108,7 @@ class gaussian_process:
         # 5. store the new covariance matrix in numpy array form within the model
         self.covariance_matrix = np.array(covariance_matrix)
     
-    # 4. builds a quantum reupload circuit with SU intermediates for the model
+    # 5. builds a quantum reupload circuit with SU intermediates for the model
     def build_quantum_circuit (self):
         
         # 1. if model isn't quantum
@@ -152,7 +158,7 @@ class gaussian_process:
         # 4. store circuit builder function in model
         self.quantum_circuit = circuit
     
-    # 5. build reupload layer quantum gates
+    # 6. build reupload layer quantum gates
     def build_reupload_layer (self, x, parameters):
                     
         # 1. add rx gates for x1 value reupload layer
@@ -164,7 +170,7 @@ class gaussian_process:
         # 2. add a special unitary for x1
         qml.SpecialUnitary(parameters, [3, 2, 1, 0])
     
-    # 6. plots a quantum circuit 
+    # 7. plots a quantum circuit 
     def plot_quantum_circuit (self):
         
         # 1. if model isn't quantum
@@ -204,52 +210,58 @@ class gaussian_process:
             
     #     return output
     
-    # def __invert_matrix (self, matrix):
+    # 8. predicts values for provided time points
+    def predict (self, predicted_time_points):
         
-    #     matrix = np.array(matrix)
+        # 1. invert the covariance matrix
+        inv_cov_mat = invert_matrix( self.covariance_matrix )
         
-    #     a, b = matrix.shape
-    #     if a != b:
-    #         raise ValueError("Only square matrices are invertible.")
+        # 2. apply the training y values to the inverted covariance matrix
+        applied_mat = inv_cov_mat.dot( self.training_y )
 
-    #     i = np.eye(a, a)
-    #     return np.linalg.lstsq(matrix, i, rcond=None)[0]
+        # 3. initialise two arrays to store prediction values and variances for each prediction
+        predictions = []
+        sigmas = []
+
+        # 4. if the model is quantum
+        if self.is_quantum:
+            
+            # 1. create two arrays containing contents of prediction time points, indexing each array results in every possible combination of prediction x
+            x1 = np.repeat(predicted_time_points, len(self.training_x))
+            x2 = np.tile(self.training_x, len(predicted_time_points))
+
+            # 2. call the quantum kernel function on x1 and x2 arrays
+            ks = self.kernel(x1, x2, self.quantum_circuit)     
+            
+            # 3. reshape result into subarrays of x training data length       
+            ks = np.reshape(ks, (-1, len(self.training_x)))
+            
+            # 4. apply applied convariance matrix to each subarray --> overwrite empty predictions array
+            predictions = np.apply_along_axis(lambda k: np.dot(k, applied_mat), 1, ks)
+            
+            # 5. determine self similarities
+            self_similarity = self.kernel(predicted_time_points, predicted_time_points, self.quantum_circuit)
+            
+            # 6. determine variance summands
+            summand = np.apply_along_axis(lambda k: np.dot(k, inv_cov_mat).dot(k), 1, ks)
+            
+            # 7. determine final variance values and store in sigmas variable --> overwrite empty array
+            sigmas = np.abs(self_similarity - summand)
         
-    # def predict (self, predicted_time_points):
-        
-    #     inv_cov_mat = self.__invert_matrix( self.covariance_matrix )
-    #     applied_mat = inv_cov_mat.dot( self.y_train )
-
-    #     predictions = []
-    #     sigmas = []
-
-    #     if self.is_quantum:
+        # 5. if the model isn't quantum
+        else:
             
-    #         x1 = np.repeat(predicted_time_points, len(self.x_train))
-    #         x2 = np.tile(self.x_train, len(predicted_time_points))
-
-    #         ks = self.kernel(x1, x2, self.circuit)            
-    #         ks = np.reshape(ks, (-1, len(self.x_train)))
-            
-    #         predictions = np.apply_along_axis(lambda k: np.dot(k, applied_mat), 1, ks)
-            
-    #         self_similarity = self.kernel(predicted_time_points, predicted_time_points, self.circuit)
-    #         summand = np.apply_along_axis(lambda k: np.dot(k, inv_cov_mat).dot(k), 1, ks)
-    #         sigmas = np.abs(self_similarity - summand)
-            
-    #     else:
-            
-    #         for current_x in predicted_time_points:
+            # 1. iterate over the to-be-predicted time points
+            for current_x in predicted_time_points:
                 
-    #             k = [self.kernel(current_x, train_x, self.kernel_parameters) for train_x in self.x_train]
+                # 1. apply the kernel function to each pair of prediction x and training data x
+                k = [ self.kernel(current_x, train_x, self.kernel_parameters) for train_x in self.training_x ]
                 
-    #             predictions.append(
-    #                 np.dot(k, applied_mat)
-    #             )
-    #             sigmas.append(
-    #                 abs(
-    #                     self.kernel(current_x, current_x, self.kernel_parameters) - np.dot(k, inv_cov_mat).dot(k)
-    #                 )
-    #             )
+                # 2. append new predictions to the predictions array --> dot product of comparisons k with applied covariance matrix
+                predictions.append( np.dot(k, applied_mat) )
+                
+                # 3. append variance at each predicted time point to sigmas array
+                sigmas.append( abs( self.kernel(current_x, current_x, self.kernel_parameters) - np.dot(k, inv_cov_mat).dot(k) ) )
 
-    #     return (predictions, sigmas)
+        # 6. return predictions and sigmas
+        return (predictions, sigmas)
