@@ -4,9 +4,11 @@ import multiprocessing as mp
 import sys
 import os
 import math
+from time import gmtime, strftime
 
 from evaluation import fitness, build_fitness_target
 from data import build_prediction_timepoints
+from plot import plot_evolution
 
 
 
@@ -90,6 +92,7 @@ def evolve (
     global _mutation_function
     global _crossover_function
     global _choice_resampler_function
+    global _fitness_plotting_data
     
     training_x, training_y = model.get_training_data()
     
@@ -112,6 +115,8 @@ def evolve (
     _crossover_function = np.vectorize(crossover, signature = "(n), (n) -> (n)")
     _choice_resampler_function = np.vectorize(resample_choice, [np.float32])
     
+    _fitness_plotting_data = np.array([])
+    
     determine_parent_probabilities()
     populate(best_genes)
     
@@ -132,6 +137,9 @@ def evolve (
             
     best_genes = _population[0]
     best_fitness = _population_fitnesses[0]
+    
+    _fitness_plotting_data = np.reshape(_fitness_plotting_data, (-1, _population_split))
+    plot_evolution("Evolution Timeline", _fitness_plotting_data, True, "evolution_timeline_" + strftime("%Y-%m-%d-%H:%M:%S", gmtime()))
     
     if (_logging):
         print("Final Result:")
@@ -275,6 +283,7 @@ def select (selection_size):
     
     global _population
     global _population_fitnesses
+    global _fitness_plotting_data
     
     individual_fitnesses = pd.DataFrame({"individual": np.arange(_population_size)})
     
@@ -299,6 +308,8 @@ def select (selection_size):
     
     _population = _population[individual_fitnesses["individual"].to_numpy()]
     _population_fitnesses = individual_fitnesses["fitness"].to_numpy()
+    
+    _fitness_plotting_data = np.append(_fitness_plotting_data, _population_fitnesses)
     
     if (_logging):
         print("\tfittest individuals:")
