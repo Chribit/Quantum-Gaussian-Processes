@@ -200,7 +200,7 @@ def plot_evolution (title, fitnesses, save = False, filename = "new_evolution_pl
         
     generations_x = np.arange(1, len(averages) + 1)
     
-    ax.plot(np.repeat(generations_x, len(fitnesses[0])), fitnesses.flatten(), 'o', color = colours[-2], alpha = 0.1, label = "individual fitnesses")
+    ax.plot(np.repeat(generations_x, len(fitnesses[0])), fitnesses.flatten(), 'o', color = colours[1], alpha = 0.2, label = "individual fitnesses")
     ax.plot(generations_x, averages, color = colours[-1], label = "weighted average fitness")
     
     legend = plt.legend(loc = "lower right", frameon = False)
