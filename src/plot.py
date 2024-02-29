@@ -177,3 +177,37 @@ def plot_circuit (title, quantum_model, save = False, filename = "new_circuit_pl
         fig.savefig(image_folder + filename + ".png", transparent = True)
     else:
         plt.show()
+
+def plot_evolution (title, fitnesses, save = False, filename = "new_evolution_plot"):
+
+    colours = __plot_init([12, 6], save)
+    
+    fig, ax = plt.subplots(1, 1)
+    
+    fig.text(0.525, 0.02, "Generations", ha = "center")
+    fig.text(0.025, 0.5, "Fitness", va = "center", rotation = "vertical")
+    plt.subplots_adjust(left = 0.1, right = 0.95, top = 0.9, bottom = 0.15)
+
+    plt.suptitle(title)
+    
+    plt.ylim(0.0, 1.0)
+    
+    averages = []
+    weights = np.arange(len(fitnesses[0]), 0, -1)
+    
+    for generation in range(len(fitnesses)):
+        averages.append(np.average(fitnesses[generation], 0, weights))
+        
+    generations_x = np.arange(1, len(averages) + 1)
+    
+    ax.plot(np.repeat(generations_x, len(fitnesses[0])), fitnesses.flatten(), 'o', color = colours[-2], alpha = 0.1, label = "individual fitnesses")
+    ax.plot(generations_x, averages, color = colours[-1], label = "weighted average fitness")
+    
+    legend = plt.legend(loc = "lower right", frameon = False)
+    frame = legend.get_frame()
+    frame.set_facecolor("#000000")
+    
+    if save:
+        fig.savefig(image_folder + filename + ".png", transparent = True)
+    else:
+        plt.show()
