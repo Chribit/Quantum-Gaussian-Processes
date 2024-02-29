@@ -1,5 +1,5 @@
 from data import generate_data, format_data, build_prediction_timepoints
-from plot import plot_dataset, plot_prediction, plot_circuit
+from plot import plot_dataset, plot_prediction, plot_circuit, plot_fitness
 from model import gaussian_process
 from evolution import evolve
 from kernel import classical_kernel_1, quantum_kernel_1
@@ -39,36 +39,53 @@ def quantum_gene_reader (genes):
 
 
 quantum_gene_count = 1 * ((4 ** 4) - 1)
-quantum_parameters = np.random.uniform(0.0, np.pi, quantum_gene_count)
-
-model = gaussian_process(
-    training_data,
-    quantum_kernel_1,
-    quantum_parameters,
-    True
-)
-
-plot_circuit("Reupload Circuit (Inversion Test)", model, True, "reupload_circuit_inversion_test_1_layer")
-
-
-
+# quantum_parameters = np.random.uniform(0.0, np.pi, quantum_gene_count)
+quantum_parameters = np.zeros(quantum_gene_count)
 
 # model = gaussian_process(
 #     training_data,
-#     combined_kernel_1
+#     quantum_kernel_1,
+#     quantum_parameters,
+#     True
 # )
 
+# plot_circuit("Reupload Circuit (Inversion Test)", model, True, "reupload_circuit_inversion_test_2_layer_zeros")
+
+# best_parameters = evolve(
+#     model,
+#     quantum_gene_reader,
+#     quantum_gene_count,
+#     0.25,
+#     5,
+#     90,
+#     0.5,
+#     0.25,
+#     True
+# )
+
+
+
+
+model = gaussian_process(
+    training_data,
+    classical_kernel_1
+)
+
+# BUG: fitness function allows for suboptimal results
 best_parameters = evolve(
     model,
-    quantum_gene_reader,
-    quantum_gene_count,
+    classical_gene_reader,
+    7,
     0.25,
-    5,
+    10,
     90,
     0.5,
     0.25,
     True
 )
+
+
+
 
 model.set_kernel_parameters( quantum_gene_reader(best_parameters))
 
@@ -83,4 +100,4 @@ window_prediction_x = build_prediction_timepoints(0.0, float(training_window), 0
 target_y, target_aucs = build_fitness_target(x_train, y_train, window_prediction_x, 0.1)
 fitness(model, 0.1, x_train, window_prediction_x, target_aucs, True, y_train, target_y)
 
-plot_prediction("Model Prediction Performance", x_train, y_train, x_test, y_test, x_pred, y_pred, sigmas, False, [np.min(data["value"].to_numpy()), np.max(data["value"].to_numpy())], True, "quantum_prediction_performance_1_layer")
+plot_prediction("Model Prediction Performance", x_train, y_train, x_test, y_test, x_pred, y_pred, sigmas, False, [np.min(data["value"].to_numpy()), np.max(data["value"].to_numpy())], True, "classical_kernel_performance__")
