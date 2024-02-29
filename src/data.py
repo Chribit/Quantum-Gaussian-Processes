@@ -71,7 +71,6 @@ def build_prediction_timepoints (start = 0.0, end = 10.0, step = 1.0):
 
     return np.arange(start, (end - 1.0) + step, step)
 
-
 def angle_scaling (data, minimum, maximum, maximum_angle = np.pi):
 
     # TODO: method can be more adaptible if arctan or similar function used to normalise values --> no more minimum and maximum
@@ -84,3 +83,23 @@ def angle_scaling (data, minimum, maximum, maximum_angle = np.pi):
     embedder = np.vectorize(lambda value: ((value - minimum) / data_range) * maximum_angle)
     
     return embedder(data)
+
+def invert_matrix (matrix):
+    
+    # 1. convert matrix to a numpy array if not already the case
+    matrix = np.array(matrix)
+    
+    # 2. get dimensions of provided matrix
+    dimension_x, dimension_y = matrix.shape
+    
+    # 3. if matrix dimensions are not equal and therefor the matrix isn't square
+    if dimension_x != dimension_y:
+        
+        # 1. throw error
+        raise ValueError("ERROR: Only square matrices are invertible.")
+
+    # 4. get an identity matrix of the determined dimensions
+    identity = np.eye(dimension_x, dimension_x)
+    
+    # 5. return the least squares solution to the linear matrix equation of input matrix and identity
+    return np.linalg.lstsq(matrix, identity, rcond = None)[0]
