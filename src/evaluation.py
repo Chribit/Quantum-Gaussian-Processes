@@ -31,7 +31,7 @@ def build_fitness_target (training_x, training_y, prediction_x, granularity):
     return (target_y, np.array(target_aucs))
 
 def fitness (model, granularity, training_x, prediction_x, target_aucs, plot = False, training_y = False, target_y = False):
-    
+        
     prediction_y, sigmas = model.predict(prediction_x)
 
     per_step_iterations = int(1 / granularity)
@@ -70,11 +70,5 @@ def fitness (model, granularity, training_x, prediction_x, target_aucs, plot = F
             "fitness_evaluation"
         )
 
-    fitness_sharpness = 2
-    average_variance = np.sum(sigmas) / len(training_x)
-    
-    if (average_variance > 0.5):
-        x += average_variance
-
-    return 1.0 - (x / (x + fitness_sharpness))
+    return 0.5 * (1.0 - np.tanh(x - np.pi))
     
