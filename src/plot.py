@@ -190,8 +190,6 @@ def plot_evolution (title, fitnesses, save = False, filename = "new_evolution_pl
 
     plt.suptitle(title)
     
-    plt.ylim(0.0, 1.0)
-    
     averages = []
     weights = np.arange(len(fitnesses[0]), 0, -1)
     
