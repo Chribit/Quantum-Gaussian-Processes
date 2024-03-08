@@ -38,51 +38,49 @@ def quantum_gene_reader (genes):
 
 
 
-quantum_gene_count = 1 * ((4 ** 4) - 1)
-# quantum_parameters = np.random.uniform(0.0, np.pi, quantum_gene_count)
+quantum_gene_count = 2 * ((4 ** 4) - 1)
 quantum_parameters = np.zeros(quantum_gene_count)
-
-# model = gaussian_process(
-#     training_data,
-#     quantum_kernel_1,
-#     quantum_parameters,
-#     True
-# )
-
-# plot_circuit("Reupload Circuit (Inversion Test)", model, True, "reupload_circuit_inversion_test_2_layer_zeros")
-
-# best_parameters = evolve(
-#     model,
-#     quantum_gene_reader,
-#     quantum_gene_count,
-#     0.25,
-#     5,
-#     90,
-#     0.5,
-#     0.25,
-#     True
-# )
-
-
-
 
 model = gaussian_process(
     training_data,
-    classical_kernel_1
+    quantum_kernel_1,
+    quantum_parameters,
+    True
 )
 
-# BUG: fitness function allows for suboptimal results
+plot_circuit("Reupload Circuit (Inversion Test)", model, True, "reupload_circuit_inversion_test_2_layer_zeros")
+
 best_parameters = evolve(
     model,
-    classical_gene_reader,
-    7,
-    0.25,
+    quantum_gene_reader,
+    quantum_gene_count,
+    0.5,
     10,
-    90,
+    40,
     0.5,
     0.25,
     True
 )
+
+
+
+
+# model = gaussian_process(
+#     training_data,
+#     classical_kernel_1
+# )
+
+# best_parameters = evolve(
+#     model,
+#     classical_gene_reader,
+#     7,
+#     0.25,
+#     40,
+#     100,
+#     0.5,
+#     0.25,
+#     True
+# )
 
 
 
@@ -98,6 +96,6 @@ y_pred, sigmas = model.predict(prediction_x)
 
 window_prediction_x = build_prediction_timepoints(0.0, float(training_window), 0.1)
 target_y, target_aucs = build_fitness_target(x_train, y_train, window_prediction_x, 0.1)
-fitness(model, 0.1, x_train, window_prediction_x, target_aucs, True, y_train, target_y)
+fitness = fitness(model, 0.1, x_train, window_prediction_x, target_aucs, True, y_train, target_y)
 
 plot_prediction("Model Prediction Performance", x_train, y_train, x_test, y_test, x_pred, y_pred, sigmas, False, [np.min(data["value"].to_numpy()), np.max(data["value"].to_numpy())], True, "classical_kernel_performance__")
