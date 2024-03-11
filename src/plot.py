@@ -189,6 +189,7 @@ def plot_evolution (title, fitnesses, save = False, filename = "new_evolution_pl
     plt.subplots_adjust(left = 0.1, right = 0.95, top = 0.9, bottom = 0.15)
 
     plt.suptitle(title)
+    ax.set_ylim([-0.05, 1.05])
     
     averages = []
     weights = np.arange(len(fitnesses[0]), 0, -1)
