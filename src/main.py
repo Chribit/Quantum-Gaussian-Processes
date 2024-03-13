@@ -1,5 +1,5 @@
 from data import generate_data, format_data, build_prediction_timepoints
-from plot import plot_dataset, plot_prediction, plot_circuit, plot_fitness
+from plot import plot_dataset, plot_prediction, plot_circuit, plot_fitness, plot_covariance_matrix
 from model import gaussian_process
 from evolution import evolve
 from kernel import classical_kernel_1, quantum_kernel_1
@@ -11,8 +11,8 @@ import sys
 
 
 days = 20
-seed = "lmu"
-data = generate_data(days, 69, "lmu")
+seed = "evolution"
+data = generate_data(days, 69, seed)
 # plot_dataset(data, "Generated Dataset (Seed: '" + seed + "')", True, "dataset_" + seed)
 
 training_window = 15
@@ -38,45 +38,26 @@ def quantum_gene_reader (genes):
 
 
 
-quantum_gene_count = 2 * ((4 ** 4) - 1)
-quantum_parameters = np.zeros(quantum_gene_count)
-
-model = gaussian_process(
-    training_data,
-    quantum_kernel_1,
-    quantum_parameters,
-    True
-)
-
-plot_circuit("Reupload Circuit (Inversion Test)", model, True, "reupload_circuit_inversion_test_2_layer_zeros")
-
-best_parameters = evolve(
-    model,
-    quantum_gene_reader,
-    quantum_gene_count,
-    0.5,
-    10,
-    40,
-    0.5,
-    0.25,
-    True
-)
-
-
-
+# quantum_gene_count = 1 * ((4 ** 4) - 1)
+# quantum_parameters = np.zeros(quantum_gene_count)
+# # quantum_parameters = np.random.uniform(0.0, np.pi, quantum_gene_count)
 
 # model = gaussian_process(
 #     training_data,
-#     classical_kernel_1
+#     quantum_kernel_1,
+#     quantum_parameters,
+#     True
 # )
+
+# plot_circuit("Reupload Circuit (Inversion Test)", model, True, "reupload_circuit_inversion_test_2_layer_zeros")
 
 # best_parameters = evolve(
 #     model,
-#     classical_gene_reader,
-#     7,
-#     0.25,
-#     40,
-#     100,
+#     quantum_gene_reader,
+#     quantum_gene_count,
+#     0.5,
+#     10,
+#     24,
 #     0.5,
 #     0.25,
 #     True
@@ -85,7 +66,35 @@ best_parameters = evolve(
 
 
 
-model.set_kernel_parameters( quantum_gene_reader(best_parameters))
+model = gaussian_process(
+    training_data,
+    classical_kernel_1
+)
+
+# best_parameters = evolve(
+#     model,
+#     classical_gene_reader,
+#     7,
+#     0.1,
+#     10,
+#     100,
+#     0.5,
+#     0.25,
+#     True
+# )
+
+# for row in range(15):
+#     for column in range(15):
+        
+#         print(row, column, (1.0 / 15.0) * (15.0 - abs((row + 1.0) - (column + 1.0))))
+
+
+
+
+# model.set_kernel_parameters( quantum_gene_reader(best_parameters))
+# model.set_kernel_parameters( classical_gene_reader(best_parameters))
+# model.set_kernel_parameters(quantum_parameters)
+model.set_kernel_parameters(np.zeros(7))
 
 x_train = training_data["time"].to_numpy()
 y_train = training_data["value"].to_numpy()
@@ -98,4 +107,7 @@ window_prediction_x = build_prediction_timepoints(0.0, float(training_window), 0
 target_y, target_aucs = build_fitness_target(x_train, y_train, window_prediction_x, 0.1)
 fitness = fitness(model, 0.1, x_train, window_prediction_x, target_aucs, True, y_train, target_y)
 
-plot_prediction("Model Prediction Performance", x_train, y_train, x_test, y_test, x_pred, y_pred, sigmas, False, [np.min(data["value"].to_numpy()), np.max(data["value"].to_numpy())], True, "classical_kernel_performance__")
+print(fitness)
+
+plot_prediction("Model Prediction Performance", x_train, y_train, x_test, y_test, x_pred, y_pred, sigmas, False, [np.min(data["value"].to_numpy()), np.max(data["value"].to_numpy())], True, "performance")
+plot_covariance_matrix(model.covariance_matrix, "Classical Model Covariance Matrix", True, "matrix")
