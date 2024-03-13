@@ -32,6 +32,8 @@ def build_fitness_target (training_x, training_y, prediction_x, granularity):
 
 def fitness (model, granularity, training_x, prediction_x, target_aucs, plot = False, training_y = False, target_y = False):
         
+    # TODO: use covariance matrix instead of curve
+        
     prediction_y, sigmas = model.predict(prediction_x)
 
     per_step_iterations = int(1 / granularity)
