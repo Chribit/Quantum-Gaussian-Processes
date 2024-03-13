@@ -50,10 +50,19 @@ def rational_quadratic (x1, x2, parameters):
 
 def classical_kernel_1 (x1, x2, parameters):
     
-    output = white_noise(x1, x2, parameters[:1])
-    output += rbf(x1, x2, parameters[1:3])
-    output += constant(x1, x2, parameters[3:4])
-    output += sine_squared(x1, x2, parameters[4:])
+    # output = white_noise(x1, x2, parameters[:1])
+    # output += rbf(x1, x2, parameters[1:3])
+    # output += constant(x1, x2, parameters[3:4])
+    # output += sine_squared(x1, x2, parameters[4:])
+    
+    # output = (1.0 / 15.0) * (15.0 - abs((x1 + 1.0) - (x2 + 1.0)))
+    
+    # output = 1.0 / (np.sqrt(2.0 * np.pi) * 0.4) * np.exp(-np.power((x1 - x2) / (0.4 * 15.0), 2.0) / 2)
+    
+    sharpness = 0.3
+    
+    output = np.exp(1.0 / ((((x1 - x2) * sharpness) ** 2) + (1.0 / np.log(2)))) - 1.0
+    output *= 100
     
     return output
 
