@@ -15,6 +15,8 @@ def generate_data (days, initial_value, seed = "42"):
     
     current = fractal_brownian_motion(seed, 0)
     full_value = (1.0 / current) * initial_value
+    
+    # full_value = 1.0
       
     output = pd.DataFrame({"time" : np.arange(days)})
     output["value"] = output["time"].apply(lambda day : float("%.2f" % (fractal_brownian_motion(seed, day) * full_value)))
@@ -22,6 +24,9 @@ def generate_data (days, initial_value, seed = "42"):
     return output
 
 def fractal_brownian_motion (seed, x):
+    
+    # output = np.sin(x) + 1.0
+    # return output
     
     normalised_squared_seed = (seed % 1000000000) / 1000000000
     base_amplitude = normalised_squared_seed * 0.5
