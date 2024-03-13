@@ -210,3 +210,23 @@ def plot_evolution (title, fitnesses, save = False, filename = "new_evolution_pl
         fig.savefig(image_folder + filename + ".png", transparent = True)
     else:
         plt.show()
+
+def plot_covariance_matrix (covariance_matrix, title, save = False, filename = "new_matrix_plot"):
+        
+    fig, ax = plt.subplots(1, 1)
+    
+    plt.suptitle(title)
+    ax.matshow(covariance_matrix, cmap = "Wistia")
+    
+    for i in range(len(covariance_matrix[0])):
+        for j in range(len(covariance_matrix[0])):
+            cell_value = "%.2f" % covariance_matrix[j, i]
+            ax.text(i, j, str(cell_value), va = 'center', ha = 'center', fontsize = 5.0, color = 'black')
+
+    ax.get_xaxis().set_visible(False)
+    ax.get_yaxis().set_visible(False)
+
+    if save:
+        fig.savefig(image_folder + filename + ".png", transparent = True)
+    else:
+        plt.show()
