@@ -120,6 +120,7 @@ def evolve (
     determine_parent_probabilities()
     populate(best_genes)
     
+    # TODO: terminate early if certain fitness threshold reached
     for cycle in range(cycles):
         
         _current_cycle = cycle
