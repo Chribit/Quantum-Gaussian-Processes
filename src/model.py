@@ -128,7 +128,8 @@ class gaussian_process:
             fused = np.concatenate((x1, x2))
             
             # 2. apply angle scaling to concatenated values --> provide range of x values to train on
-            scaled = angle_scaling(fused, 0.0, 11.0)
+            # BUG: adjust maximum based on trainings data length
+            scaled = angle_scaling(fused, 0.0, 16.0)
             
             # 3. overwrite inputs with scaled versions
             x1 = scaled[:len(x1)]
