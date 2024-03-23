@@ -32,8 +32,6 @@ for index, seed in enumerate(seeds):
     data = generate_data(days, 69, seed)
     plot_dataset(data, "Generated Dataset (Seed: '" + seed + "')", True, "dataset_" + str(index))
 
-# data = generate_data(days, 69, seeds[9])
-# plot_dataset(data, "Generated Dataset (Seed: '" + seeds[9] + "')", True, "dataset_" + str(9))
 plot_aapl()
 
 # training_window = 15
