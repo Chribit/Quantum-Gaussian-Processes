@@ -179,10 +179,10 @@ def reproduce ():
     child_genomes = _crossover_function(_population[mother_indices], _population[father_indices])
     child_genomes = _mutation_function(child_genomes)
     
-    survivors = _population[:_parent_survivorship]
+    survivors = _population[:_population_split]
     
     _population = child_genomes
-    _population[:_parent_survivorship] = survivors
+    _population[:_population_split] = survivors
     
     if (_logging):
         print("\tpopulation has finished reproducing.")
