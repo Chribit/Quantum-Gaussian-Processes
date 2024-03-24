@@ -135,7 +135,7 @@ def evolve (
         
         if (_population_fitnesses[0] >= fitness_threshold):
             if (_logging):
-                print("\nFitness threshold of %.4f reached. Terminating early." % fitness_threshold)
+                print("\nFitness threshold of %.4f reached. Terminating early.\n" % fitness_threshold)
             break
 
         if (_logging):
