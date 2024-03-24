@@ -4,8 +4,6 @@ import multiprocessing as mp
 import sys
 import os
 import math
-from time import gmtime, strftime
-
 from evaluation import fitness, build_fitness_target
 from data import build_prediction_timepoints
 from plot import plot_evolution
@@ -43,11 +41,13 @@ def evolve (
     gene_reader,
     gene_count,
     fitness_granularity,
+    fitness_threshold,
     cycles,
     population_size,
     mutation_probability,
     crossover_probability,
-    logging = False
+    logging = False,
+    filename = "evolution_timeline"
 ):
     
     best_genes = initialise_genes(gene_count)
@@ -132,6 +132,11 @@ def evolve (
         
         select(_population_split)
         reproduce()
+        
+        if (_population_fitnesses[0] >= fitness_threshold):
+            if (_logging):
+                print("\nFitness threshold of %.4f reached. Terminating early." % fitness_threshold)
+            break
 
         if (_logging):
             print("\n")
@@ -140,7 +145,7 @@ def evolve (
     best_fitness = _population_fitnesses[0]
     
     _fitness_plotting_data = np.reshape(_fitness_plotting_data, (-1, _population_split))
-    plot_evolution("Evolution Timeline", _fitness_plotting_data, True, "evolution_timeline_" + strftime("%Y-%m-%d-%H:%M:%S", gmtime()))
+    plot_evolution("Evolution Timeline", _fitness_plotting_data, True, filename)
     
     if (_logging):
         print("Final Result:")
