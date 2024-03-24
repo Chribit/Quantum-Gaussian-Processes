@@ -14,7 +14,7 @@ days = 20
 seed = "vn96e5t40wr3aijis"
 
 data = generate_data(days, 69, seed)
-plot_dataset(data, "Generated Dataset (Seed: '" + seed + "')", True, "evolution/dataset_" + seed)
+plot_dataset(data, "Generated Dataset (Seed: '" + seed + "')", True, "evolution/dataset")
 
 training_window = 15
 prediction_granularity = 0.1
@@ -60,6 +60,7 @@ def quantum_gene_reader (genes):
 #     quantum_gene_reader,
 #     quantum_gene_count,
 #     0.5,
+#     0.98,
 #     10,
 #     24,
 #     0.5,
@@ -70,48 +71,44 @@ def quantum_gene_reader (genes):
 
 
 
-# model = gaussian_process(
-#     training_data,
-#     classical_kernel_1
-# )
+model = gaussian_process(
+    training_data,
+    classical_kernel_1
+)
 
-# best_parameters = evolve(
-#     model,
-#     classical_gene_reader,
-#     7,
-#     0.1,
-#     10,
-#     100,
-#     0.5,
-#     0.25,
-#     True
-# )
-
-# for row in range(15):
-#     for column in range(15):
-        
-#         print(row, column, (1.0 / 15.0) * (15.0 - abs((row + 1.0) - (column + 1.0))))
-
+best_parameters = evolve(
+    model,
+    classical_gene_reader,
+    7,
+    0.1,
+    0.99,
+    100,
+    100,
+    0.5,
+    0.25,
+    True,
+    "evolution/timeline"
+)
 
 
 
 # model.set_kernel_parameters( quantum_gene_reader(best_parameters))
-# model.set_kernel_parameters( classical_gene_reader(best_parameters))
+model.set_kernel_parameters( classical_gene_reader(best_parameters))
 # model.set_kernel_parameters(quantum_parameters)
 # model.set_kernel_parameters(np.zeros(7))
 
-# x_train = training_data["time"].to_numpy()
-# y_train = training_data["value"].to_numpy()
-# x_test  = testing_data["time"].to_numpy()
-# y_test  = testing_data["value"].to_numpy()
-# x_pred = prediction_x
-# y_pred, sigmas = model.predict(prediction_x)
+x_train = training_data["time"].to_numpy()
+y_train = training_data["value"].to_numpy()
+x_test  = testing_data["time"].to_numpy()
+y_test  = testing_data["value"].to_numpy()
+x_pred = prediction_x
+y_pred, sigmas = model.predict(prediction_x)
 
-# window_prediction_x = build_prediction_timepoints(0.0, float(training_window), 0.1)
-# target_y, target_aucs = build_fitness_target(x_train, y_train, window_prediction_x, 0.1)
-# fitness = fitness(model, 0.1, x_train, window_prediction_x, target_aucs, True, y_train, target_y)
+window_prediction_x = build_prediction_timepoints(0.0, float(training_window), 0.1)
+target_y, target_aucs = build_fitness_target(x_train, y_train, window_prediction_x, 0.1)
+fitness = fitness(model, 0.1, x_train, window_prediction_x, target_aucs, True, "evolution/fitness", y_train, target_y)
 
-# print(fitness)
+print(fitness)
 
-# plot_prediction("Model Prediction Performance", x_train, y_train, x_test, y_test, x_pred, y_pred, sigmas, False, [np.min(data["value"].to_numpy()), np.max(data["value"].to_numpy())], True, "performance")
-# plot_covariance_matrix(model.covariance_matrix, "Classical Model Covariance Matrix", True, "matrix")
+plot_prediction("Model Prediction Performance", x_train, y_train, x_test, y_test, x_pred, y_pred, sigmas, False, [np.min(data["value"].to_numpy()) - 2.0, np.max(data["value"].to_numpy()) + 2.0], True, "evolution/performance")
+plot_covariance_matrix(model.covariance_matrix, "Classical Model Covariance Matrix", True, "evolution/matrix")

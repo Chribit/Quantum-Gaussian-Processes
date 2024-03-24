@@ -68,18 +68,18 @@ def plot_aapl (filename = "apple"):
         
 def plot_prediction (title, x_train, y_train, x_test, y_test, x_pred, y_pred, sigmas, x_limits = False, y_limits = False, save = False, filename = "new_plot"):
     
-    colours = __plot_init([12, 6], save)
+    colours = __plot_init([10, 6], save)
     
     x_test_line = np.append(np.array(x_train[-1]), x_test)
     y_test_line = np.append(np.array(y_train[-1]), y_test)
     
     fig, ax = plt.subplots(1, 1)
     
-    fig.text(0.525, 0.02, "Time", ha = "center")
-    fig.text(0.025, 0.5, "Value", va = "center", rotation = "vertical")
-    plt.subplots_adjust(left = 0.1, right = 0.95, top = 0.9, bottom = 0.15)
+    # fig.text(0.525, 0.02, "Time", ha = "center")
+    # fig.text(0.025, 0.5, "Value", va = "center", rotation = "vertical")
+    plt.subplots_adjust(left = 0.07, right = 0.98, top = 0.98, bottom = 0.07)
 
-    plt.suptitle(title)
+    # plt.suptitle(title)
     
     if (x_limits != False):
         plt.xlim(x_limits)
@@ -94,9 +94,9 @@ def plot_prediction (title, x_train, y_train, x_test, y_test, x_pred, y_pred, si
         color = colours[2],
         alpha = 0.33
     )
-    ax.plot(x_pred, y_pred, color = colours[2], label = "predictions")
-    ax.plot(x_train, y_train, color = colours[-1], alpha = 0.33)
-    ax.plot(x_test_line, y_test_line, color = colours[1], alpha = 0.33)
+    ax.plot(x_pred, y_pred, color = colours[2], label = "predictions", linewidth = 2)
+    ax.plot(x_train, y_train, color = colours[-1])
+    ax.plot(x_test_line, y_test_line, color = colours[1])
     ax.plot(x_train, y_train, 'o', color = colours[-1], label = "training data")
     ax.plot(x_test, y_test, 'o', color = colours[1], label = "testing data")
     
@@ -105,21 +105,21 @@ def plot_prediction (title, x_train, y_train, x_test, y_test, x_pred, y_pred, si
     frame.set_facecolor("#000000")
     
     if save:
-        fig.savefig(image_folder + filename + ".png", transparent = True)
+        fig.savefig(image_folder + filename + ".png")
     else:
         plt.show()
 
 def plot_fitness (title, x_train, y_train, fitness_x, fitness_y, x_pred, y_pred, sigmas, x_limits = False, y_limits = False, save = False, filename = "new_plot"):
     
-    colours = __plot_init([12, 6], save)
+    colours = __plot_init([10, 6], save)
     
     fig, ax = plt.subplots(1, 1)
     
-    fig.text(0.525, 0.02, "Time", ha = "center")
-    fig.text(0.025, 0.5, "Value", va = "center", rotation = "vertical")
-    plt.subplots_adjust(left = 0.1, right = 0.95, top = 0.9, bottom = 0.15)
+    # fig.text(0.525, 0.02, "Time", ha = "center")
+    # fig.text(0.025, 0.5, "Value", va = "center", rotation = "vertical")
+    plt.subplots_adjust(left = 0.07, right = 0.98, top = 0.98, bottom = 0.07)
 
-    plt.suptitle(title)
+    # plt.suptitle(title)
     
     if (x_limits != False):
         plt.xlim(x_limits)
@@ -137,16 +137,16 @@ def plot_fitness (title, x_train, y_train, fitness_x, fitness_y, x_pred, y_pred,
         color = prediction_colour,
         alpha = 0.33
     )
-    ax.plot(x_pred, y_pred, color = prediction_colour, label = "predictions")
+    ax.plot(x_pred, y_pred, color = prediction_colour, label = "predictions", linewidth = 2)
     ax.plot(x_train, y_train, 'o', color = target_colour, label = "training data")
-    ax.plot(fitness_x, fitness_y, color = target_colour, alpha = 0.75, label = "fitness target")
+    ax.plot(fitness_x, fitness_y, color = target_colour, label = "fitness target", linewidth = 2)
     
     legend = plt.legend(loc = "lower left", frameon = False)
     frame = legend.get_frame()
     frame.set_facecolor("#000000")
     
     if save:
-        fig.savefig(image_folder + filename + ".png", transparent = True)
+        fig.savefig(image_folder + filename + ".png")
     else:
         plt.show()
         
@@ -159,24 +159,24 @@ def plot_circuit (title, quantum_model, save = False, filename = "new_circuit_pl
     
     fig = quantum_model.plot_quantum_circuit()
     
-    plt.suptitle(title)
+    # plt.suptitle(title)
     
     if save:
-        fig.savefig(image_folder + filename + ".png", transparent = True)
+        fig.savefig(image_folder + filename + ".png")
     else:
         plt.show()
 
 def plot_evolution (title, fitnesses, save = False, filename = "new_evolution_plot"):
 
-    colours = __plot_init([12, 6], save)
+    colours = __plot_init([10, 6], save)
     
     fig, ax = plt.subplots(1, 1)
     
-    fig.text(0.525, 0.02, "Generations", ha = "center")
-    fig.text(0.025, 0.5, "Fitness", va = "center", rotation = "vertical")
-    plt.subplots_adjust(left = 0.1, right = 0.95, top = 0.9, bottom = 0.15)
+    # fig.text(0.525, 0.02, "Generations", ha = "center")
+    # fig.text(0.025, 0.5, "Fitness", va = "center", rotation = "vertical")
+    plt.subplots_adjust(left = 0.07, right = 0.98, top = 0.98, bottom = 0.07)
 
-    plt.suptitle(title)
+    # plt.suptitle(title)
     ax.set_ylim([-0.05, 1.05])
     
     averages = []
@@ -187,34 +187,37 @@ def plot_evolution (title, fitnesses, save = False, filename = "new_evolution_pl
         
     generations_x = np.arange(1, len(averages) + 1)
     
-    ax.plot(np.repeat(generations_x, len(fitnesses[0])), fitnesses.flatten(), 'o', color = colours[1], alpha = 0.2, label = "individual fitnesses")
-    ax.plot(generations_x, averages, color = colours[-1], label = "weighted average fitness")
+    ax.plot(np.repeat(generations_x, len(fitnesses[0])), fitnesses.flatten(), 'o', color = colours[1], label = "individual fitness")
+    ax.plot(generations_x, averages, color = colours[-1], label = "weighted average fitness", linewidth = 2)
     
     legend = plt.legend(loc = "lower right", frameon = False)
     frame = legend.get_frame()
     frame.set_facecolor("#000000")
     
     if save:
-        fig.savefig(image_folder + filename + ".png", transparent = True)
+        fig.savefig(image_folder + filename + ".png")
     else:
         plt.show()
 
 def plot_covariance_matrix (covariance_matrix, title, save = False, filename = "new_matrix_plot"):
-        
+    
+    colours = __plot_init([8, 8], save)
     fig, ax = plt.subplots(1, 1)
     
-    plt.suptitle(title)
+    plt.subplots_adjust(left = 0.02, right = 0.98, top = 0.98, bottom = 0.02)
+    
+    # plt.suptitle(title)
     ax.matshow(covariance_matrix, cmap = "Wistia")
     
     for i in range(len(covariance_matrix[0])):
         for j in range(len(covariance_matrix[0])):
             cell_value = "%.2f" % covariance_matrix[j, i]
-            ax.text(i, j, str(cell_value), va = 'center', ha = 'center', fontsize = 5.0, color = 'black')
+            ax.text(i, j, str(cell_value), va = 'center', ha = 'center', fontsize = 10.0, color = 'black')
 
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
 
     if save:
-        fig.savefig(image_folder + filename + ".png", transparent = True)
+        fig.savefig(image_folder + filename + ".png")
     else:
         plt.show()

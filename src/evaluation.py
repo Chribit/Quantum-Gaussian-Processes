@@ -30,7 +30,7 @@ def build_fitness_target (training_x, training_y, prediction_x, granularity):
         
     return (target_y, np.array(target_aucs))
 
-def fitness (model, granularity, training_x, prediction_x, target_aucs, plot = False, training_y = False, target_y = False):
+def fitness (model, granularity, training_x, prediction_x, target_aucs, plot = False, filepath = "fitness_evaluation", training_y = False, target_y = False):
         
     # TODO: use covariance matrix instead of curve
         
@@ -69,7 +69,7 @@ def fitness (model, granularity, training_x, prediction_x, target_aucs, plot = F
             False,
             False,
             True,
-            "fitness_evaluation"
+            filepath
         )
 
     return 0.5 * (1.0 - np.tanh(x - np.pi))
