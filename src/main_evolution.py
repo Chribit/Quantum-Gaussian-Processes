@@ -1,5 +1,5 @@
 from data import generate_data, format_data, build_prediction_timepoints
-from plot import plot_dataset, plot_prediction, plot_circuit, plot_fitness, plot_covariance_matrix, plot_aapl
+from plot import plot_dataset, plot_prediction, plot_circuit, plot_fitness, plot_covariance_matrix
 from model import gaussian_process
 from evolution import evolve
 from kernel import classical_kernel_1, quantum_kernel_1
@@ -10,33 +10,17 @@ import sys
 
 
 
-days = 365
-# seed = "372rzdnso2"
-# data = generate_data(days, 69, seed)
-# plot_dataset(data, "Generated Dataset (Seed: '" + seed + "')", True, "dataset_" + seed)
+days = 20
+seed = "vn96e5t40wr3aijis"
 
-seeds = [
-    "adu38d1ed0k21kand",
-    "7878uhe8450jffw3t5g5ggsvns3",
-    "vi5u30ß021eijdaw3",
-    "ß0ojn5btg7rfw8du3jhfnrwa",
-    "90ßpüö.,l3mkrnjfugeeff",
-    "7589rgjivmp3re2d3f49t+raük2jhrqf",
-    "567gt8fhivnwvs0rikpslrt4g3ßa22",
-    "47tg89t0bzoidjvsnjabzegu2d",
-    "58z9gujsnfiyw",
-    "vn96e5t40wr3aijis"
-]
+data = generate_data(days, 69, seed)
+plot_dataset(data, "Generated Dataset (Seed: '" + seed + "')", True, "evolution/dataset_" + seed)
 
-for index, seed in enumerate(seeds):
-    data = generate_data(days, 69, seed)
-    plot_dataset(data, "Generated Dataset (Seed: '" + seed + "')", True, "dataset_" + str(index))
+training_window = 15
+prediction_granularity = 0.1
 
-plot_aapl()
-
-# training_window = 15
-# training_data, testing_data = format_data(data, training_window)
-# prediction_x = build_prediction_timepoints(0.0, float(days), 0.1)
+training_data, testing_data = format_data(data, training_window)
+prediction_x = build_prediction_timepoints(0.0, float(days), prediction_granularity)
 
 
 

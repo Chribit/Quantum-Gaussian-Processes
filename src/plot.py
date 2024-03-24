@@ -55,7 +55,7 @@ def plot_dataset (data, title, save = False, filename = "new_plot"):
     else:
         plt.show()
    
-def plot_aapl ():
+def plot_aapl (filename = "apple"):
     
     data = pd.read_csv("data/aapl_full_data.csv")
     data.drop(columns = ['date', 'open', 'high', 'low', 'volume'], inplace = True)
@@ -64,7 +64,7 @@ def plot_aapl ():
     data.insert(0, "time", np.arange(365))
     data.index = pd.RangeIndex(0, len(data))
     
-    plot_dataset(data, "Apple Stock Prices (last 365 days)", True, "apple")
+    plot_dataset(data, "Apple Stock Prices (last 365 days)", True, filename)
         
 def plot_prediction (title, x_train, y_train, x_test, y_test, x_pred, y_pred, sigmas, x_limits = False, y_limits = False, save = False, filename = "new_plot"):
     
