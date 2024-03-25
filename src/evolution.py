@@ -4,7 +4,7 @@ import multiprocessing as mp
 import sys
 import os
 import math
-from evaluation import fitness, build_fitness_target
+from evaluation import fitness, build_fitness_target_AUC, build_fitness_target_SMD
 from data import build_prediction_timepoints
 from plot import plot_evolution
 
@@ -79,6 +79,7 @@ def evolve (
     global _training_timepoints
     global _prediction_timepoints
     global _target_aucs
+    global _target_slopes
     global _population_size
     global _genome_length
     global _parent_survivorship
@@ -102,7 +103,8 @@ def evolve (
     _fitness_granularity = fitness_granularity
     _training_timepoints = training_x
     _prediction_timepoints = build_prediction_timepoints(training_x[0], training_x[-1] + 1, _fitness_granularity)
-    _target_aucs = build_fitness_target(training_x, training_y, _prediction_timepoints, _fitness_granularity)[1]
+    _target_aucs = build_fitness_target_AUC(training_x, training_y, _prediction_timepoints, _fitness_granularity)[1]
+    _target_slopes = build_fitness_target_SMD(training_y)
     _population_size = population_size
     _genome_length = gene_count
     _parent_survivorship = int(_population_size * 0.1)
@@ -327,6 +329,7 @@ def evaluate_individual (individual_index, individual):
     
     _model.set_kernel_parameters( _gene_reader(individual))
     individual_fitness = fitness(_model, _fitness_granularity, _training_timepoints, _prediction_timepoints, _target_aucs)
+    # individual_fitness = fitness(_model, _fitness_granularity, _training_timepoints, _prediction_timepoints, None, _target_slopes)
     
     if (_logging):
         print("\t\t\tindividual %d evaluated: %.4f" % (individual_index, individual_fitness))

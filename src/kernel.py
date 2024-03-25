@@ -55,14 +55,8 @@ def classical_kernel_1 (x1, x2, parameters):
     output += constant(x1, x2, parameters[3:4])
     output += sine_squared(x1, x2, parameters[4:])
     
-    # output = (1.0 / 15.0) * (15.0 - abs((x1 + 1.0) - (x2 + 1.0)))
-    
-    # output = 1.0 / (np.sqrt(2.0 * np.pi) * 0.4) * np.exp(-np.power((x1 - x2) / (0.4 * 15.0), 2.0) / 2)
-    
-    # sharpness = 0.3
-    
-    # output = np.exp(1.0 / ((((x1 - x2) * sharpness) ** 2) + (1.0 / np.log(2)))) - 1.0
-    # output *= 100
+    # inverse to generated target function for target slopes in manhatten distance approach --> use to test accurate fitness scores 
+    # output = 1.0 - np.exp(1.0 / ((((x1 - x2) * 0.3) ** 2) + (1.0 / np.log(2)))) + 1.0
     
     return output
 

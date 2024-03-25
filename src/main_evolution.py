@@ -3,7 +3,7 @@ from plot import plot_dataset, plot_prediction, plot_circuit, plot_fitness, plot
 from model import gaussian_process
 from evolution import evolve
 from kernel import classical_kernel_1, quantum_kernel_1
-from evaluation import fitness, build_fitness_target
+from evaluation import fitness, build_fitness_target_AUC, build_fitness_target_SMD
 import numpy as np
 import sys
 
@@ -11,7 +11,7 @@ import sys
 
 
 days = 20
-seed = "vn96e5t40wr3aijis"
+seed = "diuf2837sad9dap20d"
 
 data = generate_data(days, 69, seed)
 plot_dataset(data, "Generated Dataset (Seed: '" + seed + "')", True, "evolution/dataset")
@@ -82,7 +82,7 @@ best_parameters = evolve(
     7,
     0.1,
     0.99,
-    10,
+    20,
     50,
     0.75,
     0.5,
@@ -95,7 +95,7 @@ best_parameters = evolve(
 # model.set_kernel_parameters( quantum_gene_reader(best_parameters))
 model.set_kernel_parameters( classical_gene_reader(best_parameters))
 # model.set_kernel_parameters(quantum_parameters)
-# model.set_kernel_parameters(np.zeros(7))
+# model.set_kernel_parameters(np.ones(7))
 
 x_train = training_data["time"].to_numpy()
 y_train = training_data["value"].to_numpy()
@@ -105,10 +105,14 @@ x_pred = prediction_x
 y_pred, sigmas = model.predict(prediction_x)
 
 window_prediction_x = build_prediction_timepoints(0.0, float(training_window), 0.1)
-target_y, target_aucs = build_fitness_target(x_train, y_train, window_prediction_x, 0.1)
-fitness = fitness(model, 0.1, x_train, window_prediction_x, target_aucs, True, "evolution/fitness", y_train, target_y)
+target_y, target_aucs = build_fitness_target_AUC(x_train, y_train, window_prediction_x, 0.1)
+target_slopes = build_fitness_target_SMD(y_train)
 
-print(fitness)
+auc_fitness = fitness(model, 0.1, x_train, window_prediction_x, target_aucs, None, True, "evolution/fitness", y_train, target_y)
+kld_fitness = fitness(model, 0.1, x_train, window_prediction_x, None, target_slopes, True, "evolution/fitness", y_train, target_y)
+
+print("AUC:", auc_fitness)
+print("KLD:", kld_fitness)
 
 plot_prediction("Model Prediction Performance", x_train, y_train, x_test, y_test, x_pred, y_pred, sigmas, False, [np.min(data["value"].to_numpy()) - 2.0, np.max(data["value"].to_numpy()) + 2.0], True, "evolution/performance")
 plot_covariance_matrix(model.covariance_matrix, "Classical Model Covariance Matrix", True, "evolution/matrix")
