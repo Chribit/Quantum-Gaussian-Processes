@@ -11,7 +11,7 @@ import sys
 
 
 days = 20
-seed = "diuf2837sad9dap20d"
+seed = "58z9gujsnfiyw"
 
 data = generate_data(days, 69, seed)
 plot_dataset(data, "Generated Dataset (Seed: '" + seed + "')", True, "evolution/dataset")
@@ -92,10 +92,10 @@ best_parameters = evolve(
 
 
 
-# model.set_kernel_parameters( quantum_gene_reader(best_parameters))
-model.set_kernel_parameters( classical_gene_reader(best_parameters))
+model.set_kernel_parameters( quantum_gene_reader(best_parameters))
+# model.set_kernel_parameters( classical_gene_reader(best_parameters))
 # model.set_kernel_parameters(quantum_parameters)
-# model.set_kernel_parameters(np.ones(7))
+# model.set_kernel_parameters(classical_gene_reader(np.random.uniform(0.0, 1.0, 7)))
 
 x_train = training_data["time"].to_numpy()
 y_train = training_data["value"].to_numpy()
@@ -112,7 +112,7 @@ auc_fitness = fitness(model, 0.1, x_train, window_prediction_x, target_aucs, Non
 kld_fitness = fitness(model, 0.1, x_train, window_prediction_x, None, target_slopes, True, "evolution/fitness", y_train, target_y)
 
 print("AUC:", auc_fitness)
-print("KLD:", kld_fitness)
+print("SMD:", kld_fitness)
 
 plot_prediction("Model Prediction Performance", x_train, y_train, x_test, y_test, x_pred, y_pred, sigmas, False, [np.min(data["value"].to_numpy()) - 2.0, np.max(data["value"].to_numpy()) + 2.0], True, "evolution/performance")
 plot_covariance_matrix(model.covariance_matrix, "Classical Model Covariance Matrix", True, "evolution/matrix")

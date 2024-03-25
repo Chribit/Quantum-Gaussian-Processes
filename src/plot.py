@@ -117,7 +117,7 @@ def plot_fitness (title, x_train, y_train, fitness_x, fitness_y, x_pred, y_pred,
     
     # fig.text(0.525, 0.02, "Time", ha = "center")
     # fig.text(0.025, 0.5, "Value", va = "center", rotation = "vertical")
-    plt.subplots_adjust(left = 0.07, right = 0.98, top = 0.98, bottom = 0.07)
+    plt.subplots_adjust(left = 0.09, right = 0.98, top = 0.98, bottom = 0.07)
 
     # plt.suptitle(title)
     
