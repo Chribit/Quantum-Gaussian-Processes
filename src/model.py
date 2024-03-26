@@ -180,7 +180,7 @@ class gaussian_process:
             return
         
         # 2. fetch diagram caller function via pennylane draw_mpl function
-        drawer = qml.draw_mpl(self.quantum_circuit, show_all_wires = True, decimals = 2, fontsize = 18, style = "solarized_light")
+        drawer = qml.draw_mpl(self.quantum_circuit, show_all_wires = True, decimals = 2, fontsize = 18, style = "black_white")
         
         # 3. call drawer function with throwaway parameters --> same parameter signature as circuit function in self.quantum_circuit
         fig, ax = drawer([0], [1])

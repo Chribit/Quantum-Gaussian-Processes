@@ -155,7 +155,7 @@ def plot_circuit (title, quantum_model, save = False, filename = "new_circuit_pl
     if not quantum_model.is_quantum:
         return
     
-    __plot_init([12, 6], save)
+    __plot_init([10, 6], save)
     
     fig = quantum_model.plot_quantum_circuit()
     

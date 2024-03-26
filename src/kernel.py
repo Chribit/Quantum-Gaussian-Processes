@@ -73,6 +73,6 @@ def quantum_kernel_1 (x1, x2, circuit):
         output = output[:, 1]
     
     output = np.clip(output, 0.0, 0.5)
-    output = 1.0 - 2.0 * output
+    output = (1.0 - 2.0 * output) * 1000.0
     
     return output

@@ -42,18 +42,18 @@ def quantum_gene_reader (genes):
 
 
 
-# quantum_gene_count = 1 * ((4 ** 4) - 1)
-# quantum_parameters = np.zeros(quantum_gene_count)
-# # quantum_parameters = np.random.uniform(0.0, np.pi, quantum_gene_count)
+quantum_gene_count = 2 * ((4 ** 4) - 1)
+quantum_parameters = np.zeros(quantum_gene_count)
+# quantum_parameters = np.random.uniform(0.0, np.pi, quantum_gene_count)
 
-# model = gaussian_process(
-#     training_data,
-#     quantum_kernel_1,
-#     quantum_parameters,
-#     True
-# )
+model = gaussian_process(
+    training_data,
+    quantum_kernel_1,
+    quantum_parameters,
+    True
+)
 
-# plot_circuit("Reupload Circuit (Inversion Test)", model, True, "reupload_circuit_inversion_test_2_layer_zeros")
+plot_circuit("Reupload Circuit (Inversion Test)", model, True, "evolution/reupload_circuit_inversion_test_2_layer_zeros")
 
 # best_parameters = evolve(
 #     model,
@@ -67,28 +67,29 @@ def quantum_gene_reader (genes):
 #     0.25,
 #     True
 # )
+best_parameters = quantum_parameters
 
 
 
 
-model = gaussian_process(
-    training_data,
-    classical_kernel_1
-)
+# model = gaussian_process(
+#     training_data,
+#     classical_kernel_1
+# )
 
-best_parameters = evolve(
-    model,
-    classical_gene_reader,
-    7,
-    0.1,
-    0.99,
-    20,
-    50,
-    0.75,
-    0.5,
-    True,
-    "evolution/timeline"
-)
+# best_parameters = evolve(
+#     model,
+#     classical_gene_reader,
+#     7,
+#     0.1,
+#     0.99,
+#     20,
+#     50,
+#     0.75,
+#     0.5,
+#     True,
+#     "evolution/timeline"
+# )
 
 
 
