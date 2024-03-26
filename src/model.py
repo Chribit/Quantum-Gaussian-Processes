@@ -24,7 +24,7 @@ class gaussian_process:
         # 4. if model is quantum
         if self.is_quantum:
             
-            # 2. set parameter count per layer
+            # 1. set parameter count per layer
             self.layer_parameter_count = (4 ** 4) - 1
         
         # 5. set provided kernel parameters and build covariance matrix
@@ -128,8 +128,7 @@ class gaussian_process:
             fused = np.concatenate((x1, x2))
             
             # 2. apply angle scaling to concatenated values --> provide range of x values to train on
-            # BUG: adjust maximum based on trainings data length
-            scaled = angle_scaling(fused, 0.0, 16.0)
+            scaled = angle_scaling(fused, 0.0, len(self.training_x) + 1.0)
             
             # 3. overwrite inputs with scaled versions
             x1 = scaled[:len(x1)]
