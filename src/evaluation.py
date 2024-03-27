@@ -80,6 +80,8 @@ def fitness (model, granularity, training_x, prediction_x, target_aucs = None, t
             
             x += abs(prediction_auc - target_aucs[index])
             
+        # FIXME: reintroduce variance term based on sigmas
+            
         if plot:
             
             if type(training_y) is not np.ndarray or type(target_y) is not np.ndarray:
@@ -101,5 +103,6 @@ def fitness (model, granularity, training_x, prediction_x, target_aucs = None, t
                 filepath
             )
 
-        return 0.5 * (1.0 - np.tanh(x - np.pi))
+        # return 0.5 * (1.0 - np.tanh(x - np.pi))
+        return np.e ** -x
     
