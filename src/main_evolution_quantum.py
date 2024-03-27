@@ -16,7 +16,7 @@ data = generate_data(days, 69, seed)
 plot_dataset(data, "Generated Dataset (Seed: '" + seed + "')", True, "evolution/quantum/dataset")
 
 training_window = 15
-prediction_granularity = 0.5
+prediction_granularity = 0.25
 
 training_data, testing_data = format_data(data, training_window)
 prediction_x = build_prediction_timepoints(0.0, float(days), prediction_granularity)
@@ -33,7 +33,7 @@ def quantum_gene_reader (genes):
 
 
 qubit_count = 2
-layer_count = 1
+layer_count = 2
 quantum_gene_count = layer_count * ((4 ** qubit_count) - 1)
 quantum_parameters = np.random.uniform(0.0, np.pi, quantum_gene_count)
 
@@ -51,24 +51,24 @@ plot_circuit("Reupload Circuit (Inversion Test)", model, True, "evolution/quantu
 
 
 
-# best_parameters = evolve(
-#     model,
-#     quantum_gene_reader,
-#     quantum_gene_count,
-#     prediction_granularity,
-#     0.99,
-#     10,
-#     32,
-#     0.75,
-#     0.5,
-#     True,
-#     "evolution/quantum/timeline"
-# )
+best_parameters = evolve(
+    model,
+    quantum_gene_reader,
+    quantum_gene_count,
+    prediction_granularity,
+    1.0,
+    10,
+    32,
+    0.75,
+    0.5,
+    True,
+    "evolution/quantum/timeline"
+)
 
 
 
 
-# model.set_kernel_parameters( quantum_gene_reader(best_parameters))
+model.set_kernel_parameters( quantum_gene_reader(best_parameters))
 
 x_train = training_data["time"].to_numpy()
 y_train = training_data["value"].to_numpy()
