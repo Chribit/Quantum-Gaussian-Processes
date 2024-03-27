@@ -13,7 +13,7 @@ days = 20
 seed = "58z9gujsnfiyw"
 
 data = generate_data(days, 69, seed)
-plot_dataset(data, "Generated Dataset (Seed: '" + seed + "')", True, "evolution/dataset")
+plot_dataset(data, "Generated Dataset (Seed: '" + seed + "')", True, "evolution/classic/dataset")
 
 training_window = 15
 prediction_granularity = 0.1
@@ -51,7 +51,7 @@ best_parameters = evolve(
     0.75,
     0.5,
     True,
-    "evolution/timeline"
+    "evolution/classic/timeline"
 )
 
 
@@ -68,10 +68,8 @@ y_pred, sigmas = model.predict(prediction_x)
 
 window_prediction_x = build_prediction_timepoints(0.0, float(training_window), 0.1)
 target_y, target_aucs = build_fitness_target_AUC(x_train, y_train, window_prediction_x, 0.1)
-target_slopes = build_fitness_target_SMD(y_train)
-
-auc_fitness = fitness(model, 0.1, x_train, window_prediction_x, target_aucs, None, True, "evolution/fitness", y_train, target_y)
+auc_fitness = fitness(model, 0.1, x_train, window_prediction_x, target_aucs, None, True, "evolution/classic/fitness", y_train, target_y)
 print("\nFitness (AUC):", auc_fitness)
 
-plot_prediction("Model Prediction Performance", x_train, y_train, x_test, y_test, x_pred, y_pred, sigmas, False, [np.min(data["value"].to_numpy()) - 2.0, np.max(data["value"].to_numpy()) + 2.0], True, "evolution/performance")
-plot_covariance_matrix(model.covariance_matrix, "Classical Model Covariance Matrix", True, "evolution/matrix")
+plot_prediction("Model Prediction Performance", x_train, y_train, x_test, y_test, x_pred, y_pred, sigmas, False, [np.min(data["value"].to_numpy()) - 2.0, np.max(data["value"].to_numpy()) + 2.0], True, "evolution/classic/performance")
+plot_covariance_matrix(model.covariance_matrix, "Classical Model Covariance Matrix", True, "evolution/classic/matrix")

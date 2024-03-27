@@ -1,7 +1,7 @@
 import pennylane as qml
-# from pennylane import numpy as np
 import numpy as np
 from data import angle_scaling, invert_matrix
+import sys
 
 
 
@@ -9,7 +9,7 @@ from data import angle_scaling, invert_matrix
 class gaussian_process:
     
     # 1. constructor; recieves formatted training data, a callable kernel function, parameters for that kernel function
-    def __init__ (self, training_data, kernel, kernel_parameters = np.array([]), is_quantum = False):
+    def __init__ (self, training_data, kernel, kernel_parameters = np.array([]), is_quantum = False, quantum_prediction_count = 1):
         
         # 1. set internal training x and y
         self.training_x = training_data["time"].to_numpy()
@@ -26,6 +26,10 @@ class gaussian_process:
             
             # 1. set parameter count per layer
             self.layer_parameter_count = (4 ** 4) - 1
+            # self.layer_parameter_count = (4 ** 1) - 1
+            
+            # 2. store amount of quantum predictions done by a quantum model
+            self.quantum_prediction_count = quantum_prediction_count
         
         # 5. set provided kernel parameters and build covariance matrix
         self.set_kernel_parameters(kernel_parameters)
@@ -121,14 +125,15 @@ class gaussian_process:
         circuit_parameters = np.reshape(self.kernel_parameters, (-1, self.layer_parameter_count))
 
         # 3. define a qml function to build the quantum circuit
-        @qml.qnode(qml.device('lightning.qubit', 4))
+        @qml.qnode(qml.device('lightning.qubit', wires = 4))
+        # @qml.qnode(qml.device('lightning.qubit', wires = 1))
         def circuit (x1, x2):
             
             # 1. concatenate provided x values to be compared in the kernel circuit
             fused = np.concatenate((x1, x2))
             
             # 2. apply angle scaling to concatenated values --> provide range of x values to train on
-            scaled = angle_scaling(fused, 0.0, len(self.training_x) + 1.0)
+            scaled = angle_scaling(fused, float(len(self.training_x) + self.quantum_prediction_count))
             
             # 3. overwrite inputs with scaled versions
             x1 = scaled[:len(x1)]
@@ -142,18 +147,21 @@ class gaussian_process:
                 
                 # 2. add barrier visual along all reupload wires for cleaner circuit appearance
                 qml.Barrier([3, 2, 1, 0], only_visual = True)
+                # qml.Barrier([0], only_visual = True)
                 
             # 5. iterate over circuit parameters and build layers for x2
-            for parameters in circuit_parameters:
+            for parameters in reversed(circuit_parameters):
                 
                 # 1. build adjoint reupload layer
                 qml.adjoint(self.build_reupload_layer)(x2, parameters)
                 
                 # 2. add barrier visual along all reupload wires for cleaner circuit appearance
                 qml.Barrier([3, 2, 1, 0], only_visual = True)
+                # qml.Barrier([0], only_visual = True)
 
             # 6. measure qubit on measurement wire and return the probabilities
             return qml.probs(wires = [0, 1, 2, 3])
+            # return qml.probs(wires = [0])
         
         # 4. store circuit builder function in model
         self.quantum_circuit = circuit
@@ -169,6 +177,7 @@ class gaussian_process:
         
         # 2. add a special unitary for x1
         qml.SpecialUnitary(parameters, [3, 2, 1, 0])
+        # qml.SpecialUnitary(parameters, [0])
     
     # 7. plots a quantum circuit 
     def plot_quantum_circuit (self):
@@ -188,29 +197,36 @@ class gaussian_process:
         # 4. return figure
         return fig
     
-    # def sample_prior (self, samples, mean):
-            
-    #     output = np.random.multivariate_normal(
-    #             mean = np.full(len(self.covariance_matrix), mean),
-    #             cov = self.covariance_matrix, 
-    #             size = samples
-    #         )
-            
-    #     return output
-    
-    # def sample_posterior (self, samples):
+    # 8. samples prior distrobution of model
+    def sample_prior (self, samples, mean):
         
-    #     mean = self.predict(self.x_train)[0]
-            
-    #     output = np.random.multivariate_normal(
-    #             mean = mean,
-    #             cov = self.covariance_matrix, 
-    #             size = samples
-    #         )
-            
-    #     return output
+        # 1. sample multivariate normal distribution at certain mean
+        output = np.random.multivariate_normal(
+                mean = np.full(len(self.covariance_matrix), mean),
+                cov = self.covariance_matrix, 
+                size = samples
+            )
+        
+        # 2. return samples
+        return output
     
-    # 8. predicts values for provided time points
+    # 9. samples posterior distribution of model
+    def sample_posterior (self, samples):
+        
+        # 1. determine mean by predicting training time points
+        mean = self.predict(self.x_train)[0]
+            
+        # 2. sample multivariate normal distribution using predicted mean
+        output = np.random.multivariate_normal(
+                mean = mean,
+                cov = self.covariance_matrix, 
+                size = samples
+            )
+        
+        # 3. return samples
+        return output
+    
+    # 10. predicts values for provided time points
     def predict (self, predicted_time_points):
         
         # 1. invert the covariance matrix
@@ -226,26 +242,36 @@ class gaussian_process:
         # 4. if the model is quantum
         if self.is_quantum:
             
-            # 1. create two arrays containing contents of prediction time points, indexing each array results in every possible combination of prediction x
+            # 1. check if predicted time points reach beyond maximum prediction count of the model
+            if (int(predicted_time_points[-1]) - len(self.training_x)) > self.quantum_prediction_count:
+                
+                # 1. print error message
+                print("ERROR: The predicted_time_points provided to a model.predict(...) function exceed the specified maximum prediction count. This leads to errors in angle scaling.")
+                
+                # 2. terminate execution
+                sys.exit(1)
+            
+            # 2. create two arrays containing contents of prediction time points, indexing each array results in every possible combination of prediction x
             x1 = np.repeat(predicted_time_points, len(self.training_x))
             x2 = np.tile(self.training_x, len(predicted_time_points))
 
-            # 2. call the quantum kernel function on x1 and x2 arrays
-            ks = self.kernel(x1, x2, self.quantum_circuit)     
+            # 3. call the quantum kernel function on x1 and x2 arrays
+            # OPTIMISE: major performance bottleneck here (~95% of execution time)
+            ks = self.kernel(x1, x2, self.quantum_circuit)
             
-            # 3. reshape result into subarrays of x training data length       
+            # 4. reshape result into subarrays of x training data length       
             ks = np.reshape(ks, (-1, len(self.training_x)))
-            
-            # 4. apply applied convariance matrix to each subarray --> overwrite empty predictions array
+
+            # 5. apply applied convariance matrix to each subarray --> overwrite empty predictions array
             predictions = np.apply_along_axis(lambda k: np.dot(k, applied_mat), 1, ks)
-            
-            # 5. determine self similarities
+
+            # 6. determine self similarities
             self_similarity = self.kernel(predicted_time_points, predicted_time_points, self.quantum_circuit)
             
-            # 6. determine variance summands
+            # 7. determine variance summands
             summand = np.apply_along_axis(lambda k: np.dot(k, inv_cov_mat).dot(k), 1, ks)
-            
-            # 7. determine final variance values and store in sigmas variable --> overwrite empty array
+
+            # 8. determine final variance values and store in sigmas variable --> overwrite empty array
             sigmas = np.abs(self_similarity - summand)
         
         # 5. if the model isn't quantum
