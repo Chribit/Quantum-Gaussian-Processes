@@ -64,10 +64,12 @@ def fitness (model, granularity, training_x, prediction_x, target_aucs = None, t
         
         prediction_y, sigmas = model.predict(prediction_x)
 
+        steps = len(training_x[:-1])
         per_step_iterations = int(1 / granularity)
+        
         x = 0
         
-        for index in range( len(training_x[:-1])):
+        for index in range(steps):
             
             prediction_auc = 0
             for iteration in range(per_step_iterations):
@@ -80,7 +82,7 @@ def fitness (model, granularity, training_x, prediction_x, target_aucs = None, t
             
             x += abs(prediction_auc - target_aucs[index])
             
-        # FIXME: reintroduce variance term based on sigmas
+        x = x / steps
             
         if plot:
             
