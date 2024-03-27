@@ -101,16 +101,10 @@ def build_prediction_timepoints (start = 0.0, end = 10.0, step = 1.0):
 
     return np.arange(start, (end - 1.0) + step, step)
 
-def angle_scaling (data, minimum, maximum, maximum_angle = np.pi):
+def angle_scaling (data, maximum):
 
-    # TODO: method can be more adaptible if arctan or similar function used to normalise values --> no more minimum and maximum
-
-    data_range = maximum - minimum
-    
-    if data_range == 0.0:
-        return np.full(len(data), 0.0)
-    
-    embedder = np.vectorize(lambda value: ((value - minimum) / data_range) * maximum_angle)
+    maximum_angle = np.pi 
+    embedder = np.vectorize(lambda value: (value / maximum) * maximum_angle)
     
     return embedder(data)
 
