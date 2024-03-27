@@ -1,9 +1,9 @@
 from data import generate_data, format_data, build_prediction_timepoints
-from plot import plot_dataset, plot_prediction, plot_circuit, plot_fitness, plot_covariance_matrix
+from plot import plot_dataset, plot_prediction, plot_circuit, plot_covariance_matrix
 from model import gaussian_process
 from evolution import evolve
 from kernel import quantum_kernel_1
-from evaluation import fitness, build_fitness_target_AUC, build_fitness_target_SMD
+from evaluation import fitness, build_fitness_target_AUC
 import numpy as np
 
 
@@ -16,7 +16,7 @@ data = generate_data(days, 69, seed)
 plot_dataset(data, "Generated Dataset (Seed: '" + seed + "')", True, "evolution/quantum/dataset")
 
 training_window = 15
-prediction_granularity = 0.2
+prediction_granularity = 0.5
 
 training_data, testing_data = format_data(data, training_window)
 prediction_x = build_prediction_timepoints(0.0, float(days), prediction_granularity)
@@ -32,7 +32,9 @@ def quantum_gene_reader (genes):
 
 
 
-quantum_gene_count = 2 * ((4 ** 4) - 1)
+qubit_count = 2
+layer_count = 1
+quantum_gene_count = layer_count * ((4 ** qubit_count) - 1)
 quantum_parameters = np.random.uniform(0.0, np.pi, quantum_gene_count)
 
 model = gaussian_process(
@@ -40,7 +42,8 @@ model = gaussian_process(
     quantum_kernel_1,
     quantum_parameters,
     True,
-    5
+    days - training_window,
+    qubit_count
 )
 
 plot_circuit("Reupload Circuit (Inversion Test)", model, True, "evolution/quantum/reupload_circuit_inversion_test_2_layer_zeros")
@@ -55,9 +58,9 @@ plot_circuit("Reupload Circuit (Inversion Test)", model, True, "evolution/quantu
 #     prediction_granularity,
 #     0.99,
 #     10,
-#     20,
+#     32,
+#     0.75,
 #     0.5,
-#     0.25,
 #     True,
 #     "evolution/quantum/timeline"
 # )

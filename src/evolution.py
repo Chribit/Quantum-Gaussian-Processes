@@ -63,6 +63,10 @@ def evolve (
     if (population_size % 2 != 0):
         print("\nERROR: population_size in evolve() has to be a multiple of 2")
         sys.exit(1)
+        
+    if (population_size < 4 != 0):
+        print("\nERROR: population_size in evolve() has to be at least 4")
+        sys.exit(1)
     
     if (mutation_probability > 1.0 or mutation_probability < 0.0):
         print("\nERROR: mutation_rate in evolve() has to be between 0.0 and 1.0.")

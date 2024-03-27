@@ -103,6 +103,5 @@ def fitness (model, granularity, training_x, prediction_x, target_aucs = None, t
                 filepath
             )
 
-        # return 0.5 * (1.0 - np.tanh(x - np.pi))
         return np.e ** -x
     

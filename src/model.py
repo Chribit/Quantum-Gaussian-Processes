@@ -2,6 +2,8 @@ import pennylane as qml
 import numpy as np
 from data import angle_scaling, invert_matrix
 import sys
+import itertools
+import timeit
 
 
 
@@ -9,7 +11,7 @@ import sys
 class gaussian_process:
     
     # 1. constructor; recieves formatted training data, a callable kernel function, parameters for that kernel function
-    def __init__ (self, training_data, kernel, kernel_parameters = np.array([]), is_quantum = False, quantum_prediction_count = 1):
+    def __init__ (self, training_data, kernel, kernel_parameters = np.array([]), is_quantum = False, quantum_prediction_count = 1, quantum_qubit_count = 1):
         
         # 1. set internal training x and y
         self.training_x = training_data["time"].to_numpy()
@@ -24,11 +26,13 @@ class gaussian_process:
         # 4. if model is quantum
         if self.is_quantum:
             
-            # 1. set parameter count per layer
-            self.layer_parameter_count = (4 ** 4) - 1
-            # self.layer_parameter_count = (4 ** 1) - 1
+            # 1. set qubit count used by model
+            self.qubit_count = quantum_qubit_count
             
-            # 2. store amount of quantum predictions done by a quantum model
+            # 2. set parameter count per layer
+            self.layer_parameter_count = (4 ** self.qubit_count) - 1
+            
+            # 3. store amount of quantum predictions done by a quantum model
             self.quantum_prediction_count = quantum_prediction_count
         
         # 5. set provided kernel parameters and build covariance matrix
@@ -73,17 +77,59 @@ class gaussian_process:
         # 3. if model is quantum
         if self.is_quantum:
             
-            # 1. generate a repeating sequence of training x values "matrix dimension" amount of times
-            x1 = np.repeat(self.training_x, matrix_dimensions)
+            # 1. calculate unique combinations of training x values
+            combinations = np.array(list(itertools.combinations(self.training_x, 2)))
             
-            # 2. generate a sequence of each training x value with "matrix dimension" amount
-            x2 = np.tile(self.training_x, matrix_dimensions)
+            # 2. initialise insertion index as 0
+            insertion_index = 0
             
-            # 3. generate the matrix cell values using the quantum kernel function - providing a built circuit
+            # 3. iterate over training x values
+            for row in self.training_x:
+            
+                # 1. insert self similarity combination
+                combinations = np.insert(combinations, insertion_index, [row, row], axis = 0)
+                
+                # 2. update insertion index
+                insertion_index += len(self.training_x) - row
+                
+            # 4. get x1 array from first indices in combinations 2d array
+            x1 = combinations[:, 0]
+            
+            # 5. get x2 array from second indices in combinations 2d array
+            x2 = combinations[:, 1]
+            
+            # 6. generate the matrix cell values using the quantum kernel function - providing a built circuit
             matrix_cells = self.kernel(x1, x2, self.quantum_circuit)
             
-            # 4. store a reshaped version of the 1D result as a 2D numpy array
-            covariance_matrix = np.reshape(matrix_cells, (matrix_dimensions, matrix_dimensions))
+            # 7. initialise start index as zero
+            start_index = 0
+            
+            # 8. iterate over each row in the matrix
+            for row in range(matrix_dimensions):
+                
+                # 1. initialise empty matrix row
+                matrix_row = np.empty(matrix_dimensions, dtype = float)
+                
+                # 2. calculate row end index
+                end_index = start_index + matrix_dimensions - row
+                
+                # 3. fetch matrix cell values from kernel output
+                matrix_row[0 : end_index - start_index] = matrix_cells[start_index : end_index]
+                
+                # 4. set start index to previous end index
+                start_index = end_index
+                    
+                # 5. roll values to form diagonal
+                matrix_row = np.roll(matrix_row, row)
+                    
+                # 6. iterate over left side mirrored matrix values
+                for mirror_column in range(row):
+                    
+                    # 1. fetch existing matrix value diagonally to mirrored cell
+                    matrix_row[mirror_column] = covariance_matrix[mirror_column][row]
+                
+                # 5. append built matrix row to new covariance matrix
+                covariance_matrix.append(matrix_row)
         
         # 4. if model is classical
         else:
@@ -92,21 +138,28 @@ class gaussian_process:
             for row in range(matrix_dimensions):
                 
                 # 1. initialise empty matrix row
-                matrix_row = []
+                matrix_row = np.empty(matrix_dimensions, dtype = float)
                 
                 # 2. iterate over each column in the matrix
-                for column in range(matrix_dimensions):
+                for column in range(row, matrix_dimensions):
                     
                     # 1. calculate a matrix cell using the kernel function; append to matrix row
-                    matrix_row.append(
-                        self.kernel(
-                            self.training_x[row],
-                            self.training_x[column],
-                            self.kernel_parameters
-                        )
+                    matrix_row[column - row] = self.kernel(
+                        self.training_x[row],
+                        self.training_x[column],
+                        self.kernel_parameters
                     )
+                    
+                # 3. roll values to form diagonal
+                matrix_row = np.roll(matrix_row, row)
+                    
+                # 4. iterate over left side mirrored matrix values
+                for mirror_column in range(row):
+                    
+                    # 1. fetch existing matrix value diagonally to mirrored cell
+                    matrix_row[mirror_column] = covariance_matrix[mirror_column][row]
                 
-                # 3. append built matrix row to new covariance matrix
+                # 5. append built matrix row to new covariance matrix
                 covariance_matrix.append(matrix_row)
 
         # 5. store the new covariance matrix in numpy array form within the model
@@ -125,8 +178,7 @@ class gaussian_process:
         circuit_parameters = np.reshape(self.kernel_parameters, (-1, self.layer_parameter_count))
 
         # 3. define a qml function to build the quantum circuit
-        @qml.qnode(qml.device('lightning.qubit', wires = 4))
-        # @qml.qnode(qml.device('lightning.qubit', wires = 1))
+        @qml.qnode(qml.device('lightning.qubit', wires = self.qubit_count))
         def circuit (x1, x2):
             
             # 1. concatenate provided x values to be compared in the kernel circuit
@@ -146,8 +198,7 @@ class gaussian_process:
                 self.build_reupload_layer(x1, parameters)
                 
                 # 2. add barrier visual along all reupload wires for cleaner circuit appearance
-                qml.Barrier([3, 2, 1, 0], only_visual = True)
-                # qml.Barrier([0], only_visual = True)
+                qml.Barrier(range(self.qubit_count), only_visual = True)
                 
             # 5. iterate over circuit parameters and build layers for x2
             for parameters in reversed(circuit_parameters):
@@ -156,12 +207,10 @@ class gaussian_process:
                 qml.adjoint(self.build_reupload_layer)(x2, parameters)
                 
                 # 2. add barrier visual along all reupload wires for cleaner circuit appearance
-                qml.Barrier([3, 2, 1, 0], only_visual = True)
-                # qml.Barrier([0], only_visual = True)
+                qml.Barrier(range(self.qubit_count), only_visual = True)
 
             # 6. measure qubit on measurement wire and return the probabilities
-            return qml.probs(wires = [0, 1, 2, 3])
-            # return qml.probs(wires = [0])
+            return qml.probs(wires = range(self.qubit_count))
         
         # 4. store circuit builder function in model
         self.quantum_circuit = circuit
@@ -169,15 +218,14 @@ class gaussian_process:
     # 6. build reupload layer quantum gates
     def build_reupload_layer (self, x, parameters):
                     
-        # 1. add rx gates for x1 value reupload layer
-        qml.RX(x, 3)
-        qml.RX(x, 2)
-        qml.RX(x, 1)
-        qml.RX(x, 0)
+        # 1. iterate over wires / qubits
+        for wire in range(self.qubit_count):
+            
+            # 1. add rx gates for x value reupload layer
+            qml.RX(x, wire)
         
-        # 2. add a special unitary for x1
-        qml.SpecialUnitary(parameters, [3, 2, 1, 0])
-        # qml.SpecialUnitary(parameters, [0])
+        # 2. add a special unitary for x
+        qml.SpecialUnitary(parameters, range(self.qubit_count))
     
     # 7. plots a quantum circuit 
     def plot_quantum_circuit (self):
