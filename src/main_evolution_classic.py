@@ -9,14 +9,14 @@ import numpy as np
 
 
 
-days = 20
-seed = "58z9gujsnfiyw"
+days = 31
+seed = "vn96e5t40wr3aijis"
 
 data = generate_data(days, 69, seed)
 plot_dataset(data, "Generated Dataset (Seed: '" + seed + "')", True, "evolution/classic/dataset")
 
 training_window = 15
-prediction_granularity = 0.1
+prediction_granularity = 0.25
 
 training_data, testing_data = format_data(data, training_window)
 prediction_x = build_prediction_timepoints(0.0, float(days), prediction_granularity)
@@ -45,9 +45,9 @@ best_parameters = evolve(
     classical_gene_reader,
     7,
     0.1,
-    1.0,
+    0.99,
+    10,
     100,
-    1000,
     0.75,
     0.5,
     True,

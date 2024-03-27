@@ -246,29 +246,29 @@ class gaussian_process:
         return fig
     
     # 8. samples prior distrobution of model
-    def sample_prior (self, samples, mean):
+    def sample_prior (self, sample_count, mean):
         
         # 1. sample multivariate normal distribution at certain mean
         output = np.random.multivariate_normal(
                 mean = np.full(len(self.covariance_matrix), mean),
                 cov = self.covariance_matrix, 
-                size = samples
+                size = sample_count
             )
         
         # 2. return samples
         return output
     
     # 9. samples posterior distribution of model
-    def sample_posterior (self, samples):
+    def sample_posterior (self, sample_count):
         
         # 1. determine mean by predicting training time points
-        mean = self.predict(self.x_train)[0]
+        mean = self.predict(self.training_x)[0]
             
         # 2. sample multivariate normal distribution using predicted mean
         output = np.random.multivariate_normal(
                 mean = mean,
                 cov = self.covariance_matrix, 
-                size = samples
+                size = sample_count
             )
         
         # 3. return samples

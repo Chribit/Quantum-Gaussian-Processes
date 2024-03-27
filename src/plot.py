@@ -65,7 +65,7 @@ def plot_aapl (filename = "apple"):
     data.index = pd.RangeIndex(0, len(data))
     
     plot_dataset(data, "Apple Stock Prices (last 365 days)", True, filename)
-        
+
 def plot_prediction (title, x_train, y_train, x_test, y_test, x_pred, y_pred, sigmas, x_limits = False, y_limits = False, save = False, filename = "new_plot"):
     
     colours = __plot_init([10, 6], save)
@@ -169,7 +169,6 @@ def plot_circuit (title, quantum_model, save = False, filename = "new_circuit_pl
 def plot_evolution (title, fitnesses, save = False, filename = "new_evolution_plot"):
 
     colours = __plot_init([10, 6], save)
-    
     fig, ax = plt.subplots(1, 1)
     
     # fig.text(0.525, 0.02, "Generations", ha = "center")
@@ -221,3 +220,21 @@ def plot_covariance_matrix (covariance_matrix, title, save = False, filename = "
         fig.savefig(image_folder + filename + ".png")
     else:
         plt.show()
+
+def plot_samples (x, samples, y_limits, save = False, filename = "new_samples_plot"):
+    
+    colours = __plot_init([10, 6], save)
+    fig, ax = plt.subplots(1, 1)
+    
+    plt.subplots_adjust(left = 0.07, right = 0.98, top = 0.98, bottom = 0.07)
+    ax.set_ylim(y_limits)
+    
+    for index, sample in enumerate(samples):
+        colour = colours[(index + 1) % len(colours)]
+        ax.plot(x, sample, color = colour)
+        
+    if save:
+        fig.savefig(image_folder + filename + ".png")
+    else:
+        plt.show()
+
