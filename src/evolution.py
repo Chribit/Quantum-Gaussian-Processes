@@ -329,8 +329,7 @@ def evaluate_individual (individual_index, individual):
     
     _model.set_kernel_parameters( _gene_reader(individual))
     individual_fitness = fitness(_model, _fitness_granularity, _training_timepoints, _prediction_timepoints, _target_aucs)
-    # individual_fitness = fitness(_model, _fitness_granularity, _training_timepoints, _prediction_timepoints, None, _target_slopes)
-    
+
     if (_logging):
         print("\t\t\tindividual %d evaluated: %.4f" % (individual_index, individual_fitness))
     
