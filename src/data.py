@@ -87,6 +87,8 @@ def fractal_brownian_motion (parameters, x):
     
     for layer_index in range(len(parameters)):
         output += np.sin( parameters[layer_index][2] * (x + parameters[layer_index][1])) * parameters[layer_index][0]
+        
+    output = max(0.0, output)
 
     return output
 
