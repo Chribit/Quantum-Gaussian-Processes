@@ -9,13 +9,13 @@ import numpy as np
 
 
 
-days = 31
+days = 15
 seed = "vn96e5t40wr3aijis"
 
 data = generate_data(days, 69, seed)
 plot_dataset(data, "Generated Dataset (Seed: '" + seed + "')", True, "evolution/classic/dataset")
 
-training_window = 15
+training_window = 10
 prediction_granularity = 0.25
 
 training_data, testing_data = format_data(data, training_window)
