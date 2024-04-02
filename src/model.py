@@ -178,7 +178,7 @@ class gaussian_process:
         circuit_parameters = np.reshape(self.kernel_parameters, (-1, self.layer_parameter_count))
 
         # 3. define a qml function to build the quantum circuit
-        @qml.qnode(qml.device('lightning.qubit', wires = self.qubit_count))
+        @qml.qnode(qml.device("lightning.qubit", wires = self.qubit_count))
         def circuit (x1, x2):
             
             # 1. concatenate provided x values to be compared in the kernel circuit
@@ -324,6 +324,8 @@ class gaussian_process:
         
         # 5. if the model isn't quantum
         else:
+            
+            print("\n----")
             
             # 1. iterate over the to-be-predicted time points
             for current_x in predicted_time_points:
