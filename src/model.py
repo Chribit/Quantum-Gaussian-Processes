@@ -325,8 +325,6 @@ class gaussian_process:
         # 5. if the model isn't quantum
         else:
             
-            print("\n----")
-            
             # 1. iterate over the to-be-predicted time points
             for current_x in predicted_time_points:
                 
