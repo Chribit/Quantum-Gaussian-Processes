@@ -14,7 +14,7 @@ data = generate_data(days, 69, seed)
 plot_dataset(data, "Generated Dataset (Seed: '" + seed + "')", True, "sampling/dataset")
 
 training_window = 360
-prediction_granularity = 0.25
+prediction_granularity = 4
 
 training_data, testing_data = format_data(data, training_window)
 prediction_x = build_prediction_timepoints(0.0, float(days), prediction_granularity)

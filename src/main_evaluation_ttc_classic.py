@@ -1,9 +1,8 @@
-from data import generate_data, format_data, build_prediction_timepoints, generate_seed
-from plot import plot_dataset, plot_prediction, plot_covariance_matrix
+from data import generate_data, format_data, generate_seed
+from plot import plot_dataset
 from model import gaussian_process
 from evolution import evolve
 from kernel import classical_kernel_1
-from evaluation import fitness, build_fitness_target_AUC
 import numpy as np
 
 
@@ -19,32 +18,34 @@ def classical_gene_reader (genes):
 
 
 
-days = 10
-prediction_granularity = 0.5
+prediction_granularity = 2
 
 
 
 
-for iteration in range(1000):
-    
-    print("====", iteration, "====")
-    
-    seed = generate_seed(20)
-    data = generate_data(days, 200, seed)
-    training_data, testing_data = format_data(data, days)
-    model = gaussian_process(
-        training_data,
-        classical_kernel_1
-    )
-    best_parameters = evolve(
-        model,
-        classical_gene_reader,
-        7,
-        prediction_granularity,
-        0.99,
-        100,
-        10,
-        0.5,
-        0.5,
-        False
-    )
+for days in range(5, 15):
+    for iteration in range(1000):
+        
+        print("====", days, "days - iteration", iteration, "====")
+        
+        seed = generate_seed(10)
+        data = generate_data(days, 200, seed)
+        training_data, testing_data = format_data(data, days)
+        model = gaussian_process(
+            training_data,
+            classical_kernel_1
+        )
+        best_parameters, cycles = evolve(
+            model,
+            classical_gene_reader,
+            7,
+            prediction_granularity,
+            0.99,
+            15,
+            10,
+            0.5,
+            0.5,
+            False
+        )
+        
+        print("-->", cycles)

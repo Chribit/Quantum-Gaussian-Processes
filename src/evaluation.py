@@ -11,14 +11,12 @@ def build_fitness_target_AUC (training_x, training_y, prediction_x, granularity)
     target_y = interpolate.CubicSpline(training_x, training_y)(prediction_x)
     target_aucs = []
     
-    per_step_iterations = int(1 / granularity)
-    
     for index in range(len(training_x[:-1])):
         
         target_auc = 0
-        for iteration in range(per_step_iterations):
+        for iteration in range(granularity):
             
-            prediction_index = index * per_step_iterations + iteration            
+            prediction_index = index * granularity + iteration    
             target_auc += integrate.simpson(
                     target_y[prediction_index : prediction_index + 2],
                     prediction_x[prediction_index : prediction_index + 2]
@@ -62,16 +60,15 @@ def fitness (model, granularity, training_x, prediction_x, target_aucs = None, t
         prediction_y, sigmas = model.predict(prediction_x)
 
         steps = len(training_x[:-1])
-        per_step_iterations = int(1 / granularity)
-        
+              
         x = 0
         
         for index in range(steps):
             
             prediction_auc = 0
-            for iteration in range(per_step_iterations):
+            for iteration in range(granularity):
                 
-                prediction_index = index * per_step_iterations + iteration            
+                prediction_index = index * granularity + iteration            
                 prediction_auc += integrate.simpson(
                         prediction_y[prediction_index : prediction_index + 2],
                         prediction_x[prediction_index : prediction_index + 2]

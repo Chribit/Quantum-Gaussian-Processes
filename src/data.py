@@ -106,8 +106,9 @@ def generate_seed (seed_length):
     letters = string.ascii_letters + string.digits + string.punctuation
     return "".join(random.choice(letters) for letter in range(seed_length))
 
-def build_prediction_timepoints (start = 0.0, end = 10.0, step = 1.0):
+def build_prediction_timepoints (start = 0.0, end = 10.0, granularity = 1):
 
+    step = 1.0 / granularity
     return np.arange(start, (end - 1.0) + step, step)
 
 def angle_scaling (data, maximum):
