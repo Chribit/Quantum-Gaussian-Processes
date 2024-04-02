@@ -1,9 +1,9 @@
 from data import generate_data, format_data, build_prediction_timepoints
-from plot import plot_dataset, plot_prediction, plot_circuit, plot_fitness, plot_covariance_matrix
+from plot import plot_dataset, plot_prediction, plot_covariance_matrix
 from model import gaussian_process
 from evolution import evolve
 from kernel import classical_kernel_1
-from evaluation import fitness, build_fitness_target_AUC, build_fitness_target_SMD
+from evaluation import fitness, build_fitness_target_AUC
 import numpy as np
 
 
