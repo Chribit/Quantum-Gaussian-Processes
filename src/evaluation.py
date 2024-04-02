@@ -1,6 +1,6 @@
+import sys
 import numpy as np
 from scipy import integrate, interpolate
-import sys
 from plot import plot_fitness
 
 
@@ -73,7 +73,7 @@ def fitness (model, granularity, training_x, prediction_x, target_aucs = None, t
                         prediction_y[prediction_index : prediction_index + 2],
                         prediction_x[prediction_index : prediction_index + 2]
                     )
-            
+    
             x += abs(prediction_auc - target_aucs[index])
             
         x = x / steps
@@ -99,5 +99,5 @@ def fitness (model, granularity, training_x, prediction_x, target_aucs = None, t
                 filepath
             )
 
-        return np.e ** -x
+        return np.e ** (-x / 2.0)
     
