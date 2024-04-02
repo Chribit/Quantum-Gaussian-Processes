@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 import sys
+import random
+import string
 
 
     
@@ -88,7 +90,7 @@ def fractal_brownian_motion (parameters, x):
     for layer_index in range(len(parameters)):
         output += np.sin( parameters[layer_index][2] * (x + parameters[layer_index][1])) * parameters[layer_index][0]
         
-    output = max(0.0, output)
+    output = max(0.00001, output)
 
     return output
 
@@ -98,6 +100,11 @@ def format_data (data, training_window):
     testing_data = data.tail( len(data["time"]) - training_window )
 
     return (training_data, testing_data)
+
+def generate_seed (seed_length):
+    
+    letters = string.ascii_letters + string.digits + string.punctuation
+    return "".join(random.choice(letters) for letter in range(seed_length))
 
 def build_prediction_timepoints (start = 0.0, end = 10.0, step = 1.0):
 
