@@ -47,6 +47,7 @@ def evolve (
     mutation_probability,
     crossover_probability,
     logging = False,
+    plotting = False,
     filename = "evolution_timeline"
 ):
     
@@ -77,6 +78,7 @@ def evolve (
         sys.exit(1)
     
     global _logging
+    global _plotting
     global _model
     global _gene_reader
     global _fitness_granularity
@@ -102,6 +104,7 @@ def evolve (
     training_x, training_y = model.get_training_data()
     
     _logging = logging
+    _plotting = plotting
     _model = model
     _gene_reader = gene_reader
     _fitness_granularity = fitness_granularity
@@ -149,8 +152,9 @@ def evolve (
     best_genes = _population[0]
     best_fitness = _population_fitnesses[0]
     
-    _fitness_plotting_data = np.reshape(_fitness_plotting_data, (-1, _population_split))
-    plot_evolution("Evolution Timeline", _fitness_plotting_data, True, filename)
+    if (_plotting):
+        _fitness_plotting_data = np.reshape(_fitness_plotting_data, (-1, _population_split))
+        plot_evolution("Evolution Timeline", _fitness_plotting_data, True, filename)
     
     if (_logging):
         print("Final Result:")
@@ -320,7 +324,8 @@ def select (selection_size):
     _population = _population[individual_fitnesses["individual"].to_numpy()]
     _population_fitnesses = individual_fitnesses["fitness"].to_numpy()
     
-    _fitness_plotting_data = np.append(_fitness_plotting_data, _population_fitnesses)
+    if (_plotting):
+        _fitness_plotting_data = np.append(_fitness_plotting_data, _population_fitnesses)
     
     if (_logging):
         print("\tfittest individuals:")
