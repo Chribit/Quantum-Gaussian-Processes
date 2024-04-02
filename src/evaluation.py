@@ -1,10 +1,7 @@
 import numpy as np
-from scipy import integrate, interpolate, special
-import math
+from scipy import integrate, interpolate
 import sys
-from data import build_prediction_timepoints
 from plot import plot_fitness
-import math
 
 
 
