@@ -163,7 +163,7 @@ def evolve (
         print("genes:", best_genes)
         print("parameters:", np.array(_gene_reader(best_genes)))
     
-    return best_genes
+    return (best_genes, _current_cycle)
 
 def initialise_genes (gene_count):
     return np.random.uniform(0.0, 1.0, gene_count)

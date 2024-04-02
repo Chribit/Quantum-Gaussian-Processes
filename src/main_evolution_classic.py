@@ -40,7 +40,7 @@ model = gaussian_process(
     classical_kernel_1
 )
 
-best_parameters = evolve(
+best_parameters, cycles = evolve(
     model,
     classical_gene_reader,
     7,

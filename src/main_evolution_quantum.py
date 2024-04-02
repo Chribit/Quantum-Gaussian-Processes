@@ -51,7 +51,7 @@ plot_circuit("Reupload Circuit (Inversion Test)", model, True, "evolution/quantu
 
 
 
-best_parameters = evolve(
+best_parameters, cycles = evolve(
     model,
     quantum_gene_reader,
     quantum_gene_count,
