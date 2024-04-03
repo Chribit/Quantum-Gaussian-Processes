@@ -28,9 +28,7 @@ evaluation_data = []
 
 
 
-for days in range(minimum_window, maximum_window):
-    
-    print("====", days, " days ====")
+for days in range(minimum_window, maximum_window + 1):
     
     iteration = 0
     
@@ -50,14 +48,14 @@ for days in range(minimum_window, maximum_window):
             prediction_granularity,
             0.9,
             max_cycles,
-            10,
+            8,
             0.5,
             0.5,
             False
         )
         cycles += 1
         
-        print("\titeration", iteration + 1, ":", cycles, "cycles")
+        print(days, "days - iteration", iteration + 1, ":", cycles, "cycles")
         
         if (cycles < max_cycles):
             evaluation_data.append([seed, days, cycles])
