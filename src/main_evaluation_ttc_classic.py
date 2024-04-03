@@ -48,7 +48,7 @@ for days in range(minimum_window, maximum_window + 1):
             prediction_granularity,
             0.9,
             max_cycles,
-            8,
+            16,
             0.5,
             0.5,
             False
