@@ -238,3 +238,18 @@ def plot_samples (x, samples, y_limits, save = False, filename = "new_samples_pl
     else:
         plt.show()
 
+def plot_ttc (days, classic_averages, save = False, filename = "new_samples_plot"):
+    
+    colours = __plot_init([10, 6], save)
+    fig, ax = plt.subplots(1, 1)
+    
+    plt.subplots_adjust(left = 0.07, right = 0.98, top = 0.98, bottom = 0.07)
+    ax.set_xticks(days)
+    
+    ax.bar(days - 0.15, classic_averages, color = colours[0], width = 0.3)
+    ax.bar(days + 0.15, classic_averages, color = colours[3], width = 0.3)
+    
+    if save:
+        fig.savefig(image_folder + filename + ".png")
+    else:
+        plt.show()
