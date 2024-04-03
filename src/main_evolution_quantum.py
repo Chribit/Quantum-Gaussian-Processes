@@ -16,7 +16,7 @@ data = generate_data(days, 69, seed)
 plot_dataset(data, "Generated Dataset (Seed: '" + seed + "')", True, "evolution/quantum/dataset")
 
 training_window = 15
-prediction_granularity = 4
+prediction_granularity = 2
 
 training_data, testing_data = format_data(data, training_window)
 prediction_x = build_prediction_timepoints(0.0, float(days), prediction_granularity)
@@ -32,7 +32,7 @@ def quantum_gene_reader (genes):
 
 
 
-qubit_count = 2
+qubit_count = 4
 layer_count = 2
 quantum_gene_count = layer_count * ((4 ** qubit_count) - 1)
 quantum_parameters = np.random.uniform(0.0, np.pi, quantum_gene_count)
@@ -56,10 +56,10 @@ best_parameters, cycles = evolve(
     quantum_gene_reader,
     quantum_gene_count,
     prediction_granularity,
-    1.0,
-    10,
-    32,
-    0.75,
+    0.95,
+    15,
+    16,
+    0.5,
     0.5,
     True,
     True,
