@@ -238,7 +238,7 @@ def plot_samples (x, samples, y_limits, save = False, filename = "new_samples_pl
     else:
         plt.show()
 
-def plot_ttc (days, classic_averages, save = False, filename = "new_samples_plot"):
+def plot_ttc (days, classic_averages, quantum_averages, save = False, filename = "new_samples_plot"):
     
     colours = __plot_init([10, 6], save)
     fig, ax = plt.subplots(1, 1)
@@ -247,7 +247,7 @@ def plot_ttc (days, classic_averages, save = False, filename = "new_samples_plot
     ax.set_xticks(days)
     
     ax.bar(days - 0.15, classic_averages, color = colours[0], width = 0.3)
-    ax.bar(days + 0.15, classic_averages, color = colours[3], width = 0.3)
+    ax.bar(days + 0.15, quantum_averages, color = colours[3], width = 0.3)
     
     if save:
         fig.savefig(image_folder + filename + ".png")
