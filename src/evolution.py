@@ -110,7 +110,7 @@ def evolve (
     _target_slopes = build_fitness_target_SMD(training_y)
     _population_size = population_size
     _genome_length = gene_count
-    _parent_survivorship = int(_population_size * 0.1)
+    _parent_survivorship = math.ceil(_population_size * 0.33)
     _mutation_probability = mutation_probability
     _crossover_probability = crossover_probability
     _population_split = int(population_size / 2)
