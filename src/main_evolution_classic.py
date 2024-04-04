@@ -66,12 +66,12 @@ y_train = training_data["value"].to_numpy()
 x_test  = testing_data["time"].to_numpy()
 y_test  = testing_data["value"].to_numpy()
 x_pred = prediction_x
-# y_pred, sigmas = model.predict(prediction_x)
+y_pred, sigmas = model.predict(prediction_x)
 
 window_prediction_x = build_prediction_timepoints(0.0, float(training_window), prediction_granularity)
 target_y, target_aucs = build_fitness_target_AUC(x_train, y_train, window_prediction_x, prediction_granularity)
 auc_fitness = fitness(model, prediction_granularity, x_train, window_prediction_x, target_aucs, None, True, "evolution/classic/fitness", y_train, target_y)
 print("\nFitness (AUC):", auc_fitness)
 
-# plot_prediction("Model Prediction Performance", x_train, y_train, x_test, y_test, x_pred, y_pred, sigmas, False, [np.min(data["value"].to_numpy()) - 2.0, np.max(data["value"].to_numpy()) + 2.0], True, "evolution/classic/performance")
-# plot_covariance_matrix(model.covariance_matrix, "Classical Model Covariance Matrix", True, "evolution/classic/matrix")
+plot_prediction("Model Prediction Performance", x_train, y_train, x_test, y_test, x_pred, y_pred, sigmas, False, [np.min(data["value"].to_numpy()) - 2.0, np.max(data["value"].to_numpy()) + 2.0], True, "evolution/classic/performance")
+plot_covariance_matrix(model.covariance_matrix, "Classical Model Covariance Matrix", True, "evolution/classic/matrix")
