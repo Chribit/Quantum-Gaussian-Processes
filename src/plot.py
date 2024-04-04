@@ -238,7 +238,7 @@ def plot_samples (x, samples, y_limits, save = False, filename = "new_samples_pl
     else:
         plt.show()
 
-def plot_ttc (days, classic_averages, quantum_averages, save = False, filename = "new_samples_plot"):
+def plot_ttc (days, classic_averages, quantum_averages, save = False, filename = "new_ttc_plot"):
     
     colours = __plot_init([10, 6], save)
     fig, ax = plt.subplots(1, 1)
@@ -248,6 +248,29 @@ def plot_ttc (days, classic_averages, quantum_averages, save = False, filename =
     
     ax.bar(days - 0.15, classic_averages, color = colours[0], width = 0.3)
     ax.bar(days + 0.15, quantum_averages, color = colours[3], width = 0.3)
+    
+    if save:
+        fig.savefig(image_folder + filename + ".png")
+    else:
+        plt.show()
+        
+def plot_variances (variances, x, save = False, filename = "new_variance_plot"):
+    
+    colours = __plot_init([10, 6], save)
+    fig, ax = plt.subplots(1, 1)
+    
+    plt.subplots_adjust(left = 0.07, right = 0.98, top = 0.98, bottom = 0.07)
+    
+    colour = colours[1]
+    
+    ax.plot(x, variances, color = colour, linewidth = 3)
+    plt.fill_between(
+        x,
+        np.repeat(np.min(variances), len(variances)),
+        variances,
+        color = colour,
+        alpha = 0.33
+    )
     
     if save:
         fig.savefig(image_folder + filename + ".png")
