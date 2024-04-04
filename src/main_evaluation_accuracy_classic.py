@@ -4,7 +4,6 @@ from evolution import evolve
 from kernel import classical_kernel_1
 import numpy as np
 import pandas as pd
-import math
 
 
 
