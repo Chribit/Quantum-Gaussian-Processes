@@ -26,7 +26,7 @@ evaluation_data = []
 
 
 
-qubit_count = 2
+qubit_count = 4
 layer_count = 2
 quantum_gene_count = layer_count * ((4 ** qubit_count) - 1)
 
