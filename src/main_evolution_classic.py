@@ -16,7 +16,7 @@ data = generate_data(days, 69, seed)
 plot_dataset(data, "Generated Dataset (Seed: '" + seed + "')", True, "evolution/classic/dataset")
 
 training_window = 15
-prediction_granularity = 2
+prediction_granularity = 8
 
 training_data, testing_data = format_data(data, training_window)
 prediction_x = build_prediction_timepoints(0.0, float(days), prediction_granularity)
@@ -45,12 +45,12 @@ best_parameters, cycles = evolve(
     classical_gene_reader,
     7,
     prediction_granularity,
-    0.99,
-    1,
-    4,
+    0.6,
+    10,
+    20,
     0.75,
     0.5,
-    False,
+    True,
     True,
     "evolution/classic/timeline"
 )
