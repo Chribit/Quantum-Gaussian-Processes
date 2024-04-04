@@ -60,6 +60,10 @@ def classical_kernel_1 (x1, x2, parameters):
     
     return output
 
+def classical_kernel_2 (x1, x2, parameters):
+    
+    return (np.exp(1.0 / ((((x1 - x2) * parameters[0]) ** 2) + (1.0 / np.log(2)))) - 1.0) * parameters[1]
+
 
 
 
