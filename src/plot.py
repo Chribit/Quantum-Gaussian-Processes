@@ -277,23 +277,23 @@ def plot_variances (variances, x, save = False, filename = "new_variance_plot"):
     else:
         plt.show()
 
-def plot_distances (days, accuracies, save = False, filename = "new_accuracy_plot"):
+def plot_distances (days, classic_accuracies, quantum_accuracies, save = False, filename = "new_accuracy_plot"):
     
     colours = __plot_init([10, 6], save)
     fig, ax = plt.subplots(1, 1)
     
-    plt.subplots_adjust(left = 0.02, right = 0.98, top = 0.98, bottom = 0.07)
+    plt.subplots_adjust(left = 0.09, right = 0.98, top = 0.98, bottom = 0.07)
     ax.set_xticks(days)
-    ax.set_yticks([])
     
-    ax.bar(days, accuracies, color = colours[5], width = 0.5)
+    ax.bar(days - 0.15, classic_accuracies, color = colours[1], width = 0.3)
+    ax.bar(days + 0.15, quantum_accuracies, color = colours[2], width = 0.3)
     
     if save:
         fig.savefig(image_folder + filename + ".png")
     else:
         plt.show()
         
-def plot_trends (days, trends, save = False, filename = "new_accuracy_plot"):
+def plot_trends (days, classic_trends, quantum_trends, save = False, filename = "new_accuracy_plot"):
     
     colours = __plot_init([10, 6], save)
     fig, ax = plt.subplots(1, 1)
@@ -303,7 +303,8 @@ def plot_trends (days, trends, save = False, filename = "new_accuracy_plot"):
     ax.set_yticks([0.0, 0.5, 1.0])
     plt.ylim([0.0, 1.0])
     
-    ax.bar(days, trends, color = colours[4], width = 0.5)
+    ax.bar(days - 0.15, classic_trends, color = colours[1], width = 0.3)
+    ax.bar(days + 0.15, quantum_trends, color = colours[2], width = 0.3)
     
     if save:
         fig.savefig(image_folder + filename + ".png")
