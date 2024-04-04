@@ -276,3 +276,36 @@ def plot_variances (variances, x, save = False, filename = "new_variance_plot"):
         fig.savefig(image_folder + filename + ".png")
     else:
         plt.show()
+
+def plot_distances (days, accuracies, save = False, filename = "new_accuracy_plot"):
+    
+    colours = __plot_init([10, 6], save)
+    fig, ax = plt.subplots(1, 1)
+    
+    plt.subplots_adjust(left = 0.02, right = 0.98, top = 0.98, bottom = 0.07)
+    ax.set_xticks(days)
+    ax.set_yticks([])
+    
+    ax.bar(days, accuracies, color = colours[5], width = 0.5)
+    
+    if save:
+        fig.savefig(image_folder + filename + ".png")
+    else:
+        plt.show()
+        
+def plot_trends (days, trends, save = False, filename = "new_accuracy_plot"):
+    
+    colours = __plot_init([10, 6], save)
+    fig, ax = plt.subplots(1, 1)
+    
+    plt.subplots_adjust(left = 0.07, right = 0.98, top = 0.98, bottom = 0.07)
+    ax.set_xticks(days)
+    ax.set_yticks([0.0, 0.5, 1.0])
+    plt.ylim([0.0, 1.0])
+    
+    ax.bar(days, trends, color = colours[4], width = 0.5)
+    
+    if save:
+        fig.savefig(image_folder + filename + ".png")
+    else:
+        plt.show()
