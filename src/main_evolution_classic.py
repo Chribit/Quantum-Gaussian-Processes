@@ -12,10 +12,10 @@ import numpy as np
 days = 20
 seed = "vn96e5t40wr3aijis"
 
-data = generate_data(days, 69, seed)
+data = generate_data(days, 420, seed)
 plot_dataset(data, "Generated Dataset (Seed: '" + seed + "')", True, "evolution/classic/dataset")
 
-training_window = 15
+training_window = 10
 prediction_granularity = 8
 
 training_data, testing_data = format_data(data, training_window)
@@ -45,10 +45,10 @@ best_parameters, cycles = evolve(
     classical_gene_reader,
     7,
     prediction_granularity,
-    0.6,
+    0.7,
     10,
-    20,
-    0.75,
+    100,
+    0.5,
     0.5,
     True,
     True,
@@ -73,5 +73,5 @@ target_y, target_aucs = build_fitness_target_AUC(x_train, y_train, window_predic
 auc_fitness = fitness(model, prediction_granularity, x_train, window_prediction_x, target_aucs, None, True, "evolution/classic/fitness", y_train, target_y)
 print("\nFitness (AUC):", auc_fitness)
 
-plot_prediction("Model Prediction Performance", x_train, y_train, x_test, y_test, x_pred, y_pred, sigmas, False, [np.min(data["value"].to_numpy()) - 2.0, np.max(data["value"].to_numpy()) + 2.0], True, "evolution/classic/performance")
+plot_prediction("Model Prediction Performance", x_train, y_train, x_test, y_test, x_pred, y_pred, sigmas, False, [np.min(data["value"].to_numpy()) - 40.0, np.max(data["value"].to_numpy()) + 40.0], True, "evolution/classic/performance")
 plot_covariance_matrix(model.covariance_matrix, "Classical Model Covariance Matrix", True, "evolution/classic/matrix")
